@@ -1,0 +1,23 @@
+
+
+
+10/23/18 - Dristi/Hanna
+    added trig implementation for mecanum wheels
+    added references to lift, arm extension and rotation, and collection motors
+    added encoder methods
+    added speed modifier, lift control, arm control enums
+
+
+
+10/18/18 - Dristi
+    added placeholder methods in HardwareRobot
+    initialized motors and mapped them in HardwareRobot
+    added turning component to DriveControl method controlled by right joystick
+
+
+10/16/18 - Dristi
+    created Autonomous & TeleOp folders,
+    created HardwareRobot class
+        declared and initialized DcMotors for mecanum wheels
+    created MecanumTest(TeleOp)
+        created DriveControl method (Mecanum setup)
