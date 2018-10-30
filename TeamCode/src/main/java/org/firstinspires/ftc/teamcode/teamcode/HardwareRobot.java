@@ -25,9 +25,6 @@ public class HardwareRobot {
         backRight = hwmp.dcMotor.get("Back Right");
 
 
-
-
-
     }
 
     public void ResetAllEncoders(){
@@ -42,9 +39,6 @@ public class HardwareRobot {
         extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rotationMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         collectionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-
-
 
 
     }
@@ -68,6 +62,7 @@ public class HardwareRobot {
 
     public void StopAllMotors(){
 
+        StopDriveMotors();
         liftMotor.setPower(0);
         extensionMotor.setPower(0);
         rotationMotor.setPower(0);

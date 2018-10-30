@@ -1,5 +1,14 @@
 
 
+10/30/18 - Dristi and Hanna
+    added speedMod to drive motor calculations
+    added draft methods for GrabControl, ArmExtensionControl, and ArmRotationControl using arbitrary values
+        gradient speed implementations
+
+10/25/18 - Dristi
+    speedModifiers added (slow,fast)
+    added methods for control of lift, arm, and grabber,
+    added position enums
 
 10/23/18 - Dristi/Hanna
     added trig implementation for mecanum wheels
