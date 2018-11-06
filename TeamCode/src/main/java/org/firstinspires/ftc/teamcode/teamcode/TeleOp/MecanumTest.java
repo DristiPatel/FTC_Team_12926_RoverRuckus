@@ -46,6 +46,16 @@ public class MecanumTest extends OpMode {
         backLeft.setPower(clamp(speedMod*(y1 - x1 + x2), -1, 1));
         backRight.setPower(clamp(speedMod*(y1 + x1 -x2), -1, 1));
 
+        /**
+         double angle = Math.atan2(y1, x1);
+
+         robot.frontLeft.setPower(Math.sin(-angle + Math.PI/4) - x2);
+         robot.frontRight.setPower(Math.cos(-angle + Math.PI/4) + x2);
+         robot.backLeft.setPower(Math.cos(-angle + Math.PI/4) - x2);
+         robot.backRight.setPower(Math.sin(-angle + Math.PI/4) + x2);
+
+         **/
+
 
     }
     public void CheckSpeed(){
