@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.teamcode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.teamcode.HardwareRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import java.lang.Math;
 
-public class AutoBot extends OpMode {
+@TeleOp(name="TeleOp Go di di go dee go", group="Linear Opmode")
+public class MainTeleOp extends OpMode {
 
 
     private enum DriveSpeed{

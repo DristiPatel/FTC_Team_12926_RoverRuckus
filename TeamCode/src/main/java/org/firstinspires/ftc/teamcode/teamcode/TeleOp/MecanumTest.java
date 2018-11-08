@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.teamcode.HardwareRobot;
 
+
+@TeleOp(name="Mecanum Test", group="Linear Opmode")
 public class MecanumTest extends OpMode {
 
 

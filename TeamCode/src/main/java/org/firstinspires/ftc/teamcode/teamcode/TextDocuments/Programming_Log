@@ -1,6 +1,9 @@
 
 
-10/30/18 - Dristi and Hanna
+11/06/18 - Dristi and Hanaa
+    added MecanumTest and ServoTest classes to test hardware
+
+10/30/18 - Dristi and Hanaa
     added speedMod to drive motor calculations
     added draft methods for GrabControl, ArmExtensionControl, and ArmRotationControl using arbitrary values
         gradient speed implementations
@@ -10,7 +13,7 @@
     added methods for control of lift, arm, and grabber,
     added position enums
 
-10/23/18 - Dristi/Hanna
+10/23/18 - Dristi/Hanaa
     added trig implementation for mecanum wheels
     added references to lift, arm extension and rotation, and collection motors
     added encoder methods
