@@ -1,3 +1,12 @@
+/**
+ * @author Dristi Patel
+ * @author Hanaa Siddiqui
+ *
+ * @version 1.0.0
+ * @date 11/6/2018
+ */
+
+//Importing different motors
 package org.firstinspires.ftc.teamcode.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -5,18 +14,26 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-
+/**
+ * A HardwareRobot has eight dc motors, one  servo, and one color sensor.  It can map the hardware, reset encoders, and stop motors
+ */
 public class HardwareRobot {
 
-    public DcMotor frontLeft, frontRight, backLeft, backRight;
 
-    public DcMotor liftMotor, extensionMotor, rotationMotor, collectionMotor;
+    //Instance Fields
+    public DcMotor frontLeft, frontRight, backLeft, backRight; //motors for the wheels
 
-    public Servo latch;
+    public DcMotor liftMotor, extensionMotor, rotationMotor, collectionMotor; //motors for the other functions of the robot
 
-    public ColorSensor colorSensor;
+    public Servo latch; //servo for the latch feature of the robot
 
-    //Initialize and map the motors to the robot
+    public ColorSensor colorSensor; //color sensor to test robots
+
+    //Constructors
+    /**
+     * Initializes and maps the motors to the robots
+     * @param hwmp
+     */
     public HardwareRobot(HardwareMap hwmp){
 
         frontLeft = hwmp.dcMotor.get("Front Left");
@@ -26,7 +43,10 @@ public class HardwareRobot {
 
 
     }
-
+    //Mutator methods
+    /**
+     * Stops all non-wheel motors before setting them to run with encoders
+     */
     public void ResetAllEncoders(){
 
 
@@ -43,6 +63,9 @@ public class HardwareRobot {
 
     }
 
+    /**
+     * Stops all motors before setting the non-wheel motors to run with encoders
+     */
     public void ResetDriveEncoders(){
 
          StopDriveMotors();
@@ -60,6 +83,9 @@ public class HardwareRobot {
 
     }
 
+    /**
+     * Sets the power of all motors to 0
+     */
     public void StopAllMotors(){
 
         StopDriveMotors();
@@ -70,6 +96,9 @@ public class HardwareRobot {
 
     }
 
+    /**
+     * Sets power of wheel motors to 0
+     */
     public void StopDriveMotors(){
 
         backLeft.setPower(0);
