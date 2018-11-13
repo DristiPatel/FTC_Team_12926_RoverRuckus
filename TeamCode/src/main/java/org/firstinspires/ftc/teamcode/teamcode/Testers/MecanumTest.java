@@ -39,7 +39,7 @@ public class MecanumTest extends LinearOpMode {
         frontRight.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
 
-        speedMod = .6;
+
         driveSpeed = DriveSpeed.FAST;
 
         waitForStart();
@@ -89,10 +89,10 @@ public class MecanumTest extends LinearOpMode {
 
         switch (driveSpeed){
 
-            case SLOW: speedMod = .4;
+            case SLOW: speedMod = .5;
                 break;
 
-            case FAST: speedMod = .75;
+            case FAST: speedMod = 1;
                 break;
         }
 
