@@ -50,16 +50,25 @@ public class HardwareRobot {
     public void ResetAllEncoders(){
 
 
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         collectionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rotationMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         collectionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
 
     }
 
@@ -68,17 +77,17 @@ public class HardwareRobot {
      */
     public void ResetDriveEncoders(){
 
-         StopDriveMotors();
+        StopDriveMotors();
 
-        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        collectionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rotationMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        collectionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
     }

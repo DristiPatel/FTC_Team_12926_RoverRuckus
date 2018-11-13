@@ -1,4 +1,7 @@
 
+11/9/18 - Dristi
+    edited MecanumTest class and fixed calculations for trig implementation
+    fixed problems with init() and runOpMode()
 
 11/06/18 - Dristi and Hanaa
     added MecanumTest and ServoTest classes to test hardware

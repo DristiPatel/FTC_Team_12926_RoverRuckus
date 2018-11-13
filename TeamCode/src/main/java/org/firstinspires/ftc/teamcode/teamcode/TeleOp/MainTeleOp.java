@@ -16,6 +16,7 @@ public class MainTeleOp extends OpMode {
 
     }
 
+
     private enum LiftPosition{
 
 
@@ -29,8 +30,6 @@ public class MainTeleOp extends OpMode {
     private enum ArmRotationPosition{
 
     }
-
-
 
 
     //fields to control speed of drive train
@@ -50,6 +49,7 @@ public class MainTeleOp extends OpMode {
     public void init(){
 
         robot = new HardwareRobot(hardwareMap);
+        driveSpeed = DriveSpeed.FAST;
     }
 
     @Override
@@ -79,6 +79,7 @@ public class MainTeleOp extends OpMode {
     //sets power to motors from joystick input based on mecanum setup
     public void DriveControl(){
 
+        //sets the speedMod by checking for speed adjustments via d-pad
         CheckSpeed();
 
         //Reverse the y coordinate
@@ -86,23 +87,17 @@ public class MainTeleOp extends OpMode {
         double y1 = -gamepad1.left_stick_y;
         float x2 = gamepad1.right_stick_x;
 
-        //Left joystick controls translation, right joystick controls turning
-        robot.frontLeft.setPower(clamp(speedMod*(y1 + x1 + x2), -1, 1));
-        robot.frontRight.setPower(clamp(speedMod*(y1 - x1 - x2), -1, 1));
-        robot.backLeft.setPower(clamp(speedMod*(y1 - x1 + x2), -1, 1));
-        robot.backRight.setPower(clamp(speedMod*(y1 + x1 -x2), -1, 1));
+
+        //trig implementation
+        double power = Math.hypot(x1, y1);
+        double angle = Math.atan2(y1, x1) - Math.PI/4;
+
+        robot.frontLeft.setPower(speedMod*(power * Math.cos(angle) + x2));
+        robot.frontRight.setPower(speedMod*(power * Math.sin(angle) - x2));
+        robot.backLeft.setPower(speedMod*(power * Math.sin(angle) + x2));
+        robot.backRight.setPower(speedMod*(power * Math.cos(angle) - x2));
 
 
-        // trig implementation for mecanum drive (unused alternative)
-        /**
-        double angle = Math.atan2(y1, x1);
-
-        robot.frontLeft.setPower(Math.sin(-angle + Math.PI/4) - x2);
-        robot.frontRight.setPower(Math.cos(-angle + Math.PI/4) + x2);
-        robot.backLeft.setPower(Math.cos(-angle + Math.PI/4) - x2);
-        robot.backRight.setPower(Math.sin(-angle + Math.PI/4) + x2);
-
-        **/
 
 
     }
@@ -111,11 +106,11 @@ public class MainTeleOp extends OpMode {
     //Check first controller d-pad for speed modifier
     public void CheckSpeed(){
 
-        if (gamepad1.left_bumper && driveSpeed == DriveSpeed.FAST) {
+        if (gamepad1.dpad_down && driveSpeed == DriveSpeed.FAST) {
 
             driveSpeed = DriveSpeed.SLOW;
 
-        } else if (gamepad1.left_bumper && driveSpeed == DriveSpeed.SLOW) {
+        } else if (gamepad1.dpad_up && driveSpeed == DriveSpeed.SLOW) {
 
             driveSpeed = DriveSpeed.FAST;
         }
