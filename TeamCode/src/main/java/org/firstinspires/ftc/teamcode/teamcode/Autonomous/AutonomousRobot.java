@@ -32,9 +32,9 @@ public class AutonomousRobot extends LinearOpMode {
 
     void WaitAbsolute(double seconds) {
 
-        while (runTime.seconds() <= seconds && opModeIsActive()) {
+        while (runTime.seconds() <= seconds) {
 
-            telemetry.addData("Time Remaining", Math.ceil(seconds - runTime.seconds()));
+            //telemetry.addData("Time Remaining", Math.ceil(seconds - runTime.seconds()));
             //telemetry.update();
 
             idle();
@@ -61,12 +61,14 @@ public class AutonomousRobot extends LinearOpMode {
     void DriveByTime(double time, double speed, double angle){
 
 
-       while(runTime.seconds() <= getNewTime(time)) {
-           robot.frontLeft.setPower(speed*(Math.sin(-angle + Math.PI / 4)));
-           robot.frontRight.setPower(speed*(Math.cos(-angle + Math.PI / 4)));
-           robot.backLeft.setPower(speed*(Math.cos(-angle + Math.PI / 4)));
-           robot.backRight.setPower(speed*(Math.sin(-angle + Math.PI / 4)));
-       }
+        angle = Math.toRadians(angle);
+
+           robot.frontLeft.setPower(speed*(Math.cos(angle - Math.PI / 4)));
+           robot.frontRight.setPower(speed*(Math.sin(angle - Math.PI / 4)));
+           robot.backLeft.setPower(speed*(Math.sin(angle - Math.PI / 4)));
+           robot.backRight.setPower(speed*(Math.cos(angle - Math.PI / 4)));
+
+       WaitFor(time);
 
        robot.StopDriveMotors();
 
@@ -76,12 +78,14 @@ public class AutonomousRobot extends LinearOpMode {
     //speed from [-1 to 1]; negative is left and positive is right
     void TurnByTime(double time, double speed){
 
-        while(runTime.seconds() <= getNewTime(time)) {
+
             robot.frontLeft.setPower(speed);
             robot.frontRight.setPower(-speed);
             robot.backLeft.setPower(speed);
             robot.backRight.setPower(-speed);
-        }
+
+            WaitFor(time);
+
         robot.StopDriveMotors();
 
     }

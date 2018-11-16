@@ -50,23 +50,25 @@ public class MecanumTest extends LinearOpMode {
 
             double x1 = gamepad1.left_stick_x;
             double y1 = -gamepad1.left_stick_y;
-            double x2 = gamepad1.right_stick_x;
+            double x2 = -gamepad1.right_stick_x;
 
+
+            /**
             //Left joystick controls translation, right joystick controls turning
             frontLeft.setPower(Range.clip(y1 + x1 + x2, -1, 1));
             frontRight.setPower(Range.clip(y1 - x1 - x2, -1, 1));
             backLeft.setPower(Range.clip(y1 - x1 + x2, -1, 1));
             backRight.setPower(Range.clip(y1 + x1 - x2, -1, 1));
-
+            **/
 
             //trig implementation
             double power = Math.hypot(x1, y1);
             double angle = Math.atan2(y1, x1) - Math.PI/4;
 
-            frontLeft.setPower(power * Math.cos(angle) + x2);
-            frontRight.setPower(power * Math.sin(angle) - x2);
-            backLeft.setPower(power * Math.sin(angle) + x2);
-            backRight.setPower(power * Math.cos(angle) - x2);
+            frontLeft.setPower(speedMod*(power * Math.cos(angle) + x2));
+            frontRight.setPower(speedMod*(power * Math.sin(angle) - x2));
+            backLeft.setPower(speedMod*(power * Math.sin(angle) + x2));
+            backRight.setPower(speedMod*(power * Math.cos(angle) - x2));
 
 
 

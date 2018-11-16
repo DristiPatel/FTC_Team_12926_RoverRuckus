@@ -41,6 +41,8 @@ public class HardwareRobot {
         backLeft = hwmp.dcMotor.get("Back Left");
         backRight = hwmp.dcMotor.get("Back Right");
 
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
 
     }
     //Mutator methods
