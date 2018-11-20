@@ -4,14 +4,15 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.teamcode.Autonomous.AutonomousRobot;
 
-@Autonomous(name = "Autonomous", group = "Autonomous")
+
+@Autonomous(name = "Scoot scoot", group = "Autonomous")
 
 
-public class Auto1 extends AutonomousRobot {
+public class AutoTest extends AutonomousRobot {
 
-    ElapsedTime runTime = new ElapsedTime();
-    ElapsedTime waitTime = new ElapsedTime();
+
 
     @Override
     public void runOpMode(){
