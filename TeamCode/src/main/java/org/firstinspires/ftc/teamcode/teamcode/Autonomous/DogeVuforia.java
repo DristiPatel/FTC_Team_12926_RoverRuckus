@@ -47,7 +47,7 @@ public class DogeVuforia {
     GoldAlignDetector detector;
 
     public DogeVuforia(HardwareMap hardwareMap) {
-        /**
+
         // Setup camera and Vuforia parameters
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
@@ -114,7 +114,7 @@ public class DogeVuforia {
 
         //Activate targets
         targetsRoverRuckus.activate();
-        **/
+
         detector = new GoldAlignDetector(); // Create detector
         detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance()); // Initialize it with the app context and camera
         detector.useDefaults(); // Set detector to use default settings
@@ -132,13 +132,14 @@ public class DogeVuforia {
         detector.ratioScorer.perfectRatio = 1.0; // Ratio adjustment
 
         detector.enable(); // Start the detector!
-        /**
+
+
         //Setup Vuforia
         vuforia.setDogeCVDetector(detector); // Set the Vuforia detector
         vuforia.enableDogeCV(); //Enable the DogeCV-Vuforia combo
         vuforia.showDebug(); // Show debug info
         vuforia.start(); // Start the detector
-         **/
+
     }
 
     public double getGoldXPosition(){

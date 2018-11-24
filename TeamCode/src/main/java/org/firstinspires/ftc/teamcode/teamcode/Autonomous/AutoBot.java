@@ -17,7 +17,13 @@ public class AutoBot extends AutonomousRobot{
         super.runOpMode();
 
 
-        DriveByTime(2.0,.4,230);
+        waitForStart();
+
+        DriveByTime(1.25,.4,180);
+
+        DriveByTime(1,.4, 270);
+
+        //DriveByTime(.5,.5, 0);
 
 
 
@@ -30,9 +36,11 @@ public class AutoBot extends AutonomousRobot{
 
         telemetry.update();
 
-        //GoldAlign();
+        GoldAlign();
 
-        StopVuforia();
+        //KnockGold();
+
+        //StopVuforia();
 
     }
 

@@ -160,10 +160,10 @@ public class AutonomousRobot extends LinearOpMode {
         while(!dogevuforia.getIsAligned()) {
 
                 //move right until aligned
-                robot.frontLeft.setPower(.3);
-                robot.frontRight.setPower(-.3);
-                robot.backLeft.setPower(-.3);
-                robot.backRight.setPower(.3);
+                robot.frontLeft.setPower(.2);
+                robot.frontRight.setPower(.2);
+                robot.backLeft.setPower(.2);
+                robot.backRight.setPower(.2);
 
 
 
@@ -178,6 +178,12 @@ public class AutonomousRobot extends LinearOpMode {
     }
 
     void KnockGold(){
+
+        DriveByTime(.5, .3, 270);
+
+        DriveByTime(1,.4,180);
+
+
 
 
 
