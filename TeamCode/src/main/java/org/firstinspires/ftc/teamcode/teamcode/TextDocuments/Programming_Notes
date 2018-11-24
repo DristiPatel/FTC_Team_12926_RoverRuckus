@@ -1,16 +1,13 @@
 TO-DO
 --------
 
-add Telemetry for TeleOp
-
-add imu compatibility
-
-add encoder/distance based autonomous movement
 
 add DogeCV stuff //gold cube is aligned at x = 270
     detect gold mineral
     move to align with gold mineral
 
-add Vuforia for field placement
-    scan picture
+add Vuforia for field placement*****
+
+fix strafing
+
 

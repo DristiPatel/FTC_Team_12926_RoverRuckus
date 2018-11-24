@@ -97,9 +97,9 @@ public class DogeVuforia {
 
 
         //Set camera displacement
-        final int CAMERA_FORWARD_DISPLACEMENT = 110;   // eg: Camera is 110 mm in front of robot center
-        final int CAMERA_VERTICAL_DISPLACEMENT = 200;   // eg: Camera is 200 mm above ground
-        final int CAMERA_LEFT_DISPLACEMENT = 0;     // eg: Camera is ON the robot's center line
+        final int CAMERA_FORWARD_DISPLACEMENT = -27-26;   // eg: Camera is 110 mm in front of robot center
+        final int CAMERA_VERTICAL_DISPLACEMENT = 181;   // eg: Camera is 200 mm above ground
+        final int CAMERA_LEFT_DISPLACEMENT = 219-14;     // eg: Camera is ON the robot's center line
 
         // Set phone location on robot
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix

@@ -1,4 +1,22 @@
 
+11/23/18 - Dristi
+    created method for robot to move right until it aligns with the gold block - GoldAlign()
+    started programming autonomous class for actual movement of robot on the field
+        strafe robot in front of the leftmost sample mineral (problems with strafe: hardware?)
+        GoldAlign() method for robot to align with gold block
+
+11/20/18 - Dristi
+    tested DogeCV GoldAlignDetector class and implemented program for robot
+    to follow the gold block and stop when aligned with the gold block
+
+    added Vuforia to robot to detect the Navigation Targets
+    added autonomous methods to strafe at any degree or turn for a period of time
+
+
+11/18/18 - Dristi
+    Added DogeCV and openCVLibrary libraries and made them dependencies of TeamCode
+    imported classes from DogeCV to be used as tester classes
+
 11/9/18 - Dristi
     edited MecanumTest class and fixed calculations for trig implementation
     fixed problems with init() and runOpMode()

@@ -12,6 +12,7 @@ import com.disnodeteam.dogecv.scoring.MaxAreaScorer;
 import com.disnodeteam.dogecv.scoring.RatioScorer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -50,6 +51,23 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 @TeleOp(name="Vuforia Phone Testing", group="DogeCV")
 
 public class VuforiaTest extends OpMode {
+
+
+    private enum DriveSpeed{
+
+        SLOW, FAST
+
+    }
+
+    private DcMotor frontLeft, frontRight, backLeft, backRight;
+
+
+    private DriveSpeed driveSpeed;
+    private double speedMod;
+
+
+
+
     //Elapsed time and measurement constants
     private ElapsedTime runtime = new ElapsedTime();
     private static final float mmPerInch        = 25.4f;
@@ -72,6 +90,22 @@ public class VuforiaTest extends OpMode {
 
     @Override
     public void init() {
+
+        frontLeft = hardwareMap.get(DcMotor.class, "Front Left");
+        frontRight = hardwareMap.get(DcMotor.class, "Front Right");
+        backLeft = hardwareMap.get(DcMotor.class, "Back Left");
+        backRight = hardwareMap.get(DcMotor.class, "Back Right");
+
+        //reverse a side of motors
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
+
+
+        driveSpeed = DriveSpeed.FAST;
+        speedMod = 1;
+
+
+
         // Setup camera and Vuforia parameters
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
@@ -121,15 +155,15 @@ public class VuforiaTest extends OpMode {
 
 
         //Set camera displacement
-        final int CAMERA_FORWARD_DISPLACEMENT  = 110;   // eg: Camera is 110 mm in front of robot center
-        final int CAMERA_VERTICAL_DISPLACEMENT = 200;   // eg: Camera is 200 mm above ground
-        final int CAMERA_LEFT_DISPLACEMENT     = 0;     // eg: Camera is ON the robot's center line
+        final int CAMERA_FORWARD_DISPLACEMENT = -27-26;   // eg: Camera is 110 mm in front of robot center
+        final int CAMERA_VERTICAL_DISPLACEMENT = 181;   // eg: Camera is 200 mm above ground
+        final int CAMERA_LEFT_DISPLACEMENT = 219-14;     // eg: Camera is ON the robot's center line
 
         // Set phone location on robot
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES,
-                        CAMERA_CHOICE == FRONT ? 90 : -90, 0, 0));
+                        90, -90, 0));
 
         //Set info for the trackables
         for (VuforiaTrackable trackable : allTrackables) {
@@ -175,6 +209,27 @@ public class VuforiaTest extends OpMode {
      */
     @Override
     public void loop() {
+
+
+        CheckSpeed();
+
+
+        //telemetry.addData("Speed:  ", speedMod);
+        //telemetry.update();
+
+        double x1 = gamepad1.left_stick_x;
+        double y1 = -gamepad1.left_stick_y;
+        double x2 = -gamepad1.right_stick_x;
+
+
+        //trig implementation
+        double power = Math.hypot(x1, y1);
+        double angle = Math.atan2(y1, x1) - Math.PI/4;
+
+        frontLeft.setPower(speedMod*(power * Math.cos(angle) + x2));
+        frontRight.setPower(speedMod*(power * Math.sin(angle) - x2));
+        backLeft.setPower(speedMod*(power * Math.sin(angle) + x2));
+        backRight.setPower(speedMod*(power * Math.cos(angle) - x2));
         //Assume we can't find a target
         targetVisible = false;
 
@@ -219,6 +274,30 @@ public class VuforiaTest extends OpMode {
     @Override
     public void stop() {
         vuforia.stop();
+
+    }
+
+
+    public void CheckSpeed(){
+
+        if (gamepad1.left_bumper && driveSpeed == DriveSpeed.FAST) {
+
+            driveSpeed = DriveSpeed.SLOW;
+
+        } else if (gamepad1.right_bumper && driveSpeed == DriveSpeed.SLOW) {
+
+            driveSpeed = DriveSpeed.FAST;
+        }
+
+        switch (driveSpeed){
+
+            case SLOW: speedMod = .5;
+                break;
+
+            case FAST: speedMod = 1;
+                break;
+        }
+
 
     }
 
