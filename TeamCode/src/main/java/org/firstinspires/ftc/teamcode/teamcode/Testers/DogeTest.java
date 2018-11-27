@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.teamcode.Autonomous.AutonomousRobot;
 import org.firstinspires.ftc.teamcode.teamcode.HardwareRobot;
 
-@TeleOp(name = "Doge scoot", group = "Doge")
+@TeleOp(name = "Doge scoot follow gold", group = "Doge")
 
 
 public class DogeTest extends LinearOpMode {

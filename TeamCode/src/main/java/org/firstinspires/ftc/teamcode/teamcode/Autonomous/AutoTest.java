@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.teamcode.Autonomous.AutonomousRobot;
 
 
-@Autonomous(name = "Scoot scoot", group = "Autonomous")
+@Autonomous(name = "Strafe testing", group = "Autonomous")
 
 
 public class AutoTest extends AutonomousRobot {

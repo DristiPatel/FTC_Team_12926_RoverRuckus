@@ -157,24 +157,28 @@ public class AutonomousRobot extends LinearOpMode {
 
     void GoldAlign(){
 
-        while(!dogevuforia.getIsAligned()) {
+        double stopTime = getNewTime(5);
+
+        while (runTime.seconds() <= stopTime) {
+
+            while (!dogevuforia.getIsAligned()) {
 
                 //move right until aligned
-                robot.frontLeft.setPower(.2);
-                robot.frontRight.setPower(.2);
-                robot.backLeft.setPower(.2);
-                robot.backRight.setPower(.2);
+                robot.frontLeft.setPower(-.2);
+                robot.frontRight.setPower(-.2);
+                robot.backLeft.setPower(-.2);
+                robot.backRight.setPower(-.2);
 
+            }
+            //stop robot if no gold cube in sight or aligned
+            robot.frontLeft.setPower(0);
+            robot.frontRight.setPower(0);
+            robot.backLeft.setPower(0);
+            robot.backRight.setPower(0);
 
+            break;
 
         }
-        //stop robot if no gold cube in sight or aligned
-        robot.frontLeft.setPower(0);
-        robot.frontRight.setPower(0);
-        robot.backLeft.setPower(0);
-        robot.backRight.setPower(0);
-
-
     }
 
     void KnockGold(){
@@ -185,6 +189,17 @@ public class AutonomousRobot extends LinearOpMode {
 
 
 
+    }
+
+
+
+    void Unlatch(){
+
+
+    }
+
+    void Latch(){
+
 
 
     }
@@ -194,7 +209,5 @@ public class AutonomousRobot extends LinearOpMode {
         dogevuforia.StopDoge();
 
     }
-
-
 
 }

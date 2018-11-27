@@ -48,7 +48,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Vuforia Phone Testing", group="DogeCV")
+@TeleOp(name="Vuforia Phone Testing with Drive", group="DogeCV")
 
 public class VuforiaTest extends OpMode {
 

@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.teamcode.HardwareRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import java.lang.Math;
 
-@TeleOp(name="TeleOp Go di di go dee go", group="Linear Opmode")
+@TeleOp(name="Main TeleOop placeholder", group="Linear Opmode")
 public class MainTeleOp extends OpMode {
 
 

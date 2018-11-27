@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.teamcode.Autonomous.AutonomousRobot;
 
-@Autonomous(name = "detector.exe scoot", group = "Autonomous")
+@Autonomous(name = "doge test", group = "Autonomous")
 
 public class DetectorTest extends AutonomousRobot {
 
