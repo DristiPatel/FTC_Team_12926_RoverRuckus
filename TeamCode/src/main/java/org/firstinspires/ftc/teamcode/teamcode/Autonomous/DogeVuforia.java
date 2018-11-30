@@ -71,7 +71,7 @@ public class DogeVuforia {
         VuforiaTrackable backSpace = targetsRoverRuckus.get(3);
         backSpace.setName("Back-Space");
 
-        // For convenience, gather together all the trackable objects in one easily-iterable collection
+        // For convenience, gather together all the trackable objects in one easily-iterable collection */
         allTrackables.addAll(targetsRoverRuckus);
 
         // Set trackables' location on field
@@ -87,7 +87,7 @@ public class DogeVuforia {
 
         OpenGLMatrix frontCratersLocationOnField = OpenGLMatrix
                 .translation(-mmFTCFieldWidth, 0, mmTargetHeight)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 90));
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0 , 90));
         frontCraters.setLocation(frontCratersLocationOnField);
 
         OpenGLMatrix backSpaceLocationOnField = OpenGLMatrix
@@ -105,15 +105,16 @@ public class DogeVuforia {
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES,
-                         90 , -90, 0));
+                        90, -90, 0));
 
         //Set info for the trackables
         for (VuforiaTrackable trackable : allTrackables) {
-            ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
+            ((VuforiaTrackableDefaultListener)trackable.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
         }
 
         //Activate targets
         targetsRoverRuckus.activate();
+
 
         detector = new GoldAlignDetector(); // Create detector
         detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance()); // Initialize it with the app context and camera
@@ -130,15 +131,6 @@ public class DogeVuforia {
 
         detector.ratioScorer.weight = 5; //
         detector.ratioScorer.perfectRatio = 1.0; // Ratio adjustment
-
-        detector.enable(); // Start the detector!
-
-
-        //Setup Vuforia
-        vuforia.setDogeCVDetector(detector); // Set the Vuforia detector
-        vuforia.enableDogeCV(); //Enable the DogeCV-Vuforia combo
-        vuforia.showDebug(); // Show debug info
-        vuforia.start(); // Start the detector
 
     }
 
@@ -165,6 +157,12 @@ public class DogeVuforia {
     public void StopDoge(){
 
         detector.disable();
+
+    }
+
+    public void StartDoge(){
+
+        detector.enable();
 
     }
 

@@ -38,7 +38,7 @@ public class AutonomousRobot extends LinearOpMode {
     @Override
     public void runOpMode(){
 
-        AutoPosition location = AutoPosition.UNKNOWN;
+        location = AutoPosition.UNKNOWN;
 
         robot = new HardwareRobot(hardwareMap);
         imu = new ImuSensor(hardwareMap);
@@ -75,8 +75,6 @@ public class AutonomousRobot extends LinearOpMode {
         WaitAbsolute(getNewTime(seconds));
 
     }
-
-
 
 
     //strafe drive for a given amount of seconds at a given speed and angle (in radians)
@@ -159,15 +157,17 @@ public class AutonomousRobot extends LinearOpMode {
 
         double stopTime = getNewTime(5);
 
+        dogevuforia.StartDoge();
+
         while (runTime.seconds() <= stopTime) {
 
             while (!dogevuforia.getIsAligned()) {
 
                 //move right until aligned
-                robot.frontLeft.setPower(-.2);
-                robot.frontRight.setPower(-.2);
-                robot.backLeft.setPower(-.2);
-                robot.backRight.setPower(-.2);
+                robot.frontLeft.setPower(.2);
+                robot.frontRight.setPower(.2);
+                robot.backLeft.setPower(.2);
+                robot.backRight.setPower(.2);
 
             }
             //stop robot if no gold cube in sight or aligned
@@ -179,6 +179,9 @@ public class AutonomousRobot extends LinearOpMode {
             break;
 
         }
+
+        dogevuforia.StopDoge();
+
     }
 
     void KnockGold(){

@@ -16,19 +16,6 @@ public class AutoBot extends AutonomousRobot{
 
         super.runOpMode();
 
-
-        waitForStart();
-
-        DriveByTime(1.25,.4,180);
-
-        DriveByTime(1,.4, 270);
-
-
-
-
-
-        //Align and knock off gold cube.
-
         telemetry.addData("Is Aligned?: ", dogevuforia.getIsAligned()); // Is the bot aligned with the gold mineral?
         telemetry.addData("X Pos: ", dogevuforia.getGoldXPosition()); // Gold X position.
         telemetry.addData("Gold in sight: ", dogevuforia.isGold());//Is the gold cube in sight
@@ -36,11 +23,26 @@ public class AutoBot extends AutonomousRobot{
 
         telemetry.update();
 
+
+        waitForStart();
+
+        DriveByTime(1.25,.4,0);
+
+        DriveByTime(1.3,.4, 270);
+
+
+
+
+
+        //Align and knock off gold cube.
+
+
+
         GoldAlign();
 
         //KnockGold();
 
-        //StopVuforia();
+        StopVuforia();
 
     }
 
