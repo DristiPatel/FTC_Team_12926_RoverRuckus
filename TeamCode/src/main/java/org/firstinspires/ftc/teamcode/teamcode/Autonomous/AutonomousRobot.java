@@ -13,16 +13,13 @@ import org.firstinspires.ftc.teamcode.teamcode.HardwareRobot;
 
 public class AutonomousRobot extends LinearOpMode {
 
+    //relative to crater
     enum AutoPosition{
 
-        CLOSE, FAR, UNKNOWN
+        RED_CLOSE, RED_FAR, BLUE_CLOSE, BLUE_FAR, UNKNOWN
     }
 
-    enum GoldPosition{
 
-        LEFT, CENTER, RIGHT, UNKNOWN;
-
-    }
 
     HardwareRobot robot;
     ImuSensor imu;
@@ -30,7 +27,7 @@ public class AutonomousRobot extends LinearOpMode {
 
 
     AutoPosition location = AutoPosition.UNKNOWN;
-    GoldPosition goldPosition = GoldPosition.UNKNOWN;
+
 
     ElapsedTime runTime;
 
@@ -44,13 +41,9 @@ public class AutonomousRobot extends LinearOpMode {
         imu = new ImuSensor(hardwareMap);
         dogevuforia = new DogeVuforia(hardwareMap);
 
-
         runTime = new ElapsedTime();
 
-
-
     }
-
 
     void WaitAbsolute(double seconds) {
 
@@ -63,7 +56,6 @@ public class AutonomousRobot extends LinearOpMode {
 
         }
     }
-
 
     double getNewTime(double addedSeconds) {
 
@@ -95,6 +87,7 @@ public class AutonomousRobot extends LinearOpMode {
 
     }
 
+    //rotate for a certain amount of time
     //speed from [-1 to 1]; negative is left and positive is right
     void TurnByTime(double time, double speed){
 
@@ -110,7 +103,7 @@ public class AutonomousRobot extends LinearOpMode {
 
     }
 
-
+    //rotate robot on center axis to an absolute angle
     void AbsoluteTurn(double angle, double speed, double timeout) {
 
 
@@ -139,6 +132,7 @@ public class AutonomousRobot extends LinearOpMode {
 
     }
 
+    //rotate robot on center axis for an angle relative to current position
     void RelativeTurn(double angle, double speed, double timeout) {
 
         double turnTo = angle + imu.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
@@ -152,54 +146,98 @@ public class AutonomousRobot extends LinearOpMode {
 
     }
 
+    void Unlatch(){
 
+
+    }
+
+    //drive to in front of the rightmost sampling block
+    void DriveToSampling(){
+
+
+        if(location == AutoPosition.RED_CLOSE || location == AutoPosition.BLUE_CLOSE) {
+            DriveByTime(1.25, .4, 0);
+            DriveByTime(1.3, .4, 270);
+        }else{
+            DriveByTime(1.25, .4, 0);
+            DriveByTime(1.3, .4, 90);
+
+        }
+    }
+
+    //keep driving left until aligned with the gold block
     void GoldAlign(){
 
         double stopTime = getNewTime(5);
 
         dogevuforia.StartDoge();
 
-        while (runTime.seconds() <= stopTime) {
 
-            while (!dogevuforia.getIsAligned()) {
+        while (!dogevuforia.getIsAligned() && runTime.seconds() <= stopTime) {
 
+            if(location == AutoPosition.RED_CLOSE || location == AutoPosition.BLUE_CLOSE) {
+                //move left until aligned
+                robot.frontLeft.setPower(.2);
+                robot.frontRight.setPower(.2);
+                robot.backLeft.setPower(.2);
+                robot.backRight.setPower(.2);
+            }else{
                 //move right until aligned
+                robot.frontLeft.setPower(-.2);
+                robot.frontRight.setPower(-.2);
+                robot.backLeft.setPower(-.2);
+                robot.backRight.setPower(-.2);
+
+            }
+        }
+
+        //stop robot if no gold cube in sight or aligned
+        robot.StopDriveMotors();
+
+        dogevuforia.StopDoge();
+
+    }
+
+    //drive forward to knock off gold cube and drive back
+    void KnockGold(){
+
+        if (location == AutoPosition.RED_CLOSE || location == AutoPosition.BLUE_CLOSE) {
+
+            DriveByTime(3, .4, 0);
+
+        }else{
+
+
+
+        }
+    }
+
+
+    void DriveToCenter(){
+
+        if (location == AutoPosition.RED_CLOSE || location == AutoPosition.BLUE_CLOSE){
+
+            while (!dogevuforia.isTargetVisible()){
+
                 robot.frontLeft.setPower(.2);
                 robot.frontRight.setPower(.2);
                 robot.backLeft.setPower(.2);
                 robot.backRight.setPower(.2);
 
             }
-            //stop robot if no gold cube in sight or aligned
-            robot.frontLeft.setPower(0);
-            robot.frontRight.setPower(0);
-            robot.backLeft.setPower(0);
-            robot.backRight.setPower(0);
 
-            break;
 
+        }else{
+
+            robot.frontLeft.setPower(-.2);
+            robot.frontRight.setPower(-.2);
+            robot.backLeft.setPower(-.2);
+            robot.backRight.setPower(-.2);
         }
 
-        dogevuforia.StopDoge();
-
+        robot.StopDriveMotors();
     }
 
-    void KnockGold(){
-
-        DriveByTime(.5, .3, 270);
-
-        DriveByTime(1,.4,180);
-
-
-
-    }
-
-
-
-    void Unlatch(){
-
-
-    }
 
     void Latch(){
 
@@ -207,10 +245,11 @@ public class AutonomousRobot extends LinearOpMode {
 
     }
 
-    void StopVuforia(){
+    void setLocation(AutoPosition pos){
 
-        dogevuforia.StopDoge();
+        location = pos;
 
     }
+
 
 }

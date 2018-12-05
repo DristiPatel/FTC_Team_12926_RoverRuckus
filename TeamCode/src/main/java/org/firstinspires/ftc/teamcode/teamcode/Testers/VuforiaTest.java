@@ -163,7 +163,7 @@ public class VuforiaTest extends OpMode {
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES,
-                        90, -90, 0));
+                        90, 0, 0));
 
         //Set info for the trackables
         for (VuforiaTrackable trackable : allTrackables) {
@@ -230,6 +230,8 @@ public class VuforiaTest extends OpMode {
         frontRight.setPower(speedMod*(power * Math.sin(angle) - x2));
         backLeft.setPower(speedMod*(power * Math.sin(angle) + x2));
         backRight.setPower(speedMod*(power * Math.cos(angle) - x2));
+
+
         //Assume we can't find a target
         targetVisible = false;
 

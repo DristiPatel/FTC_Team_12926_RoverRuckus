@@ -3,6 +3,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.teamcode.HardwareRobot;
+import org.firstinspires.ftc.teamcode.teamcode.Testers.MecanumTest;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import java.lang.Math;
 
@@ -49,13 +51,13 @@ public class MainTeleOp extends OpMode {
     public void init(){
 
         robot = new HardwareRobot(hardwareMap);
+
         driveSpeed = DriveSpeed.FAST;
+        speedMod = 1;
     }
 
     @Override
     public void loop(){
-
-        Telemetry();
 
         DriveControl();
 
@@ -65,22 +67,24 @@ public class MainTeleOp extends OpMode {
 
         ArmExtensionControl();
 
-
+        telemetry.addData("Speed:  ", speedMod);
+        telemetry.addData("Lift Position", robot.liftMotor.getCurrentPosition());
+        telemetry.addData("Extension Position", robot.extensionMotor.getCurrentPosition());
+        telemetry.addData("Rotation Position", robot.rotationMotor.getCurrentPosition());
+        telemetry.update();
 
 
     }
 
-    private void Telemetry(){
 
-    //display run data here
-
-    }
 
     //sets power to motors from joystick input based on mecanum setup
     public void DriveControl(){
 
         //sets the speedMod by checking for speed adjustments via d-pad
         CheckSpeed();
+
+
 
         //Reverse the y coordinate
         double x1 = gamepad1.left_stick_x;
@@ -96,8 +100,6 @@ public class MainTeleOp extends OpMode {
         robot.frontRight.setPower(speedMod*(power * Math.sin(angle) - x2));
         robot.backLeft.setPower(speedMod*(power * Math.sin(angle) + x2));
         robot.backRight.setPower(speedMod*(power * Math.cos(angle) - x2));
-
-
 
 
     }
@@ -117,10 +119,10 @@ public class MainTeleOp extends OpMode {
 
         switch (driveSpeed){
 
-            case SLOW: speedMod = .4;
+            case SLOW: speedMod = .5;
                         break;
 
-            case FAST: speedMod = .75;
+            case FAST: speedMod = 1;
                         break;
         }
 
@@ -137,6 +139,18 @@ public class MainTeleOp extends OpMode {
         final int MID_POSITION = 1750;
         final int MIN_POSITION = 250;
 
+        if (gamepad2.dpad_up){
+
+            robot.liftMotor.setPower(.2);
+
+
+        }else if (gamepad2.dpad_down){
+
+            robot.liftMotor.setPower(-.2);
+        }else{
+
+            robot.liftMotor.setPower(0);
+        }
 
     }
 
@@ -150,7 +164,7 @@ public class MainTeleOp extends OpMode {
 
             if (robot.rotationMotor.getCurrentPosition() > MIN_POSITION && robot.rotationMotor.getCurrentPosition() < MAX_POSITION) {
 
-                robot.rotationMotor.setPower(-gamepad2.right_stick_y * 0.6);
+                robot.rotationMotor.setPower(-gamepad2.right_stick_y * 0.2);
 
             } else {
 
@@ -171,7 +185,7 @@ public class MainTeleOp extends OpMode {
 
             if (robot.extensionMotor.getCurrentPosition() > MIN_POSITION && robot.extensionMotor.getCurrentPosition() < MAX_POSITION) {
 
-                robot.extensionMotor.setPower(-gamepad2.left_stick_y * 0.6);
+                robot.extensionMotor.setPower(-gamepad2.left_stick_y * 0.2);
 
             } else {
 

@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
@@ -105,7 +106,7 @@ public class DogeVuforia {
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES,
-                        90, -90, 0));
+                        90, 0, 0));
 
         //Set info for the trackables
         for (VuforiaTrackable trackable : allTrackables) {
@@ -163,6 +164,54 @@ public class DogeVuforia {
     public void StartDoge(){
 
         detector.enable();
+
+    }
+
+    public void TrackTargets(){
+
+
+        for (VuforiaTrackable trackable : allTrackables) {
+            if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
+                //We found a target!
+                targetVisible = true;
+
+                // getUpdatedRobotLocation() will return null if no new information is available since the last time that call was made, or if the trackable is not currently visible.
+                OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
+                if (robotLocationTransform != null) {
+                    lastLocation = robotLocationTransform;
+                }
+                break;
+
+            }else{
+
+                //Target not in sight
+                targetVisible = false;
+            }
+        }
+
+    }
+
+
+    public VectorF getTranslation(){
+
+
+        VectorF translation = lastLocation.getTranslation();
+        return translation;
+
+    }
+    public Orientation getOrientation(){
+
+
+        Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
+        return rotation;
+
+    }
+
+    public boolean isTargetVisible(){
+
+
+        TrackTargets();
+        return targetVisible;
 
     }
 

@@ -21,6 +21,7 @@ public class MecanumTest extends LinearOpMode {
     }
 
     private DcMotor frontLeft, frontRight, backLeft, backRight;
+    private DcMotor lift;
 
 
     private DriveSpeed driveSpeed;
@@ -40,6 +41,8 @@ public class MecanumTest extends LinearOpMode {
         //reverse a side of motors
         frontRight.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
+
+        //lift = hardwareMap.get(DcMotor.class, "Lift");
 
 
         driveSpeed = DriveSpeed.FAST;
@@ -62,13 +65,6 @@ public class MecanumTest extends LinearOpMode {
             double x2 = -gamepad1.right_stick_x;
 
 
-            /**
-            //Left joystick controls translation, right joystick controls turning
-            frontLeft.setPower(Range.clip(y1 + x1 + x2, -1, 1));
-            frontRight.setPower(Range.clip(y1 - x1 - x2, -1, 1));
-            backLeft.setPower(Range.clip(y1 - x1 + x2, -1, 1));
-            backRight.setPower(Range.clip(y1 + x1 - x2, -1, 1));
-            **/
 
             //trig implementation
             double power = Math.hypot(x1, y1);
@@ -79,6 +75,7 @@ public class MecanumTest extends LinearOpMode {
             backLeft.setPower(speedMod*(power * Math.sin(angle) + x2));
             backRight.setPower(speedMod*(power * Math.cos(angle) - x2));
 
+            //LiftControl();
 
         }
 
@@ -104,6 +101,22 @@ public class MecanumTest extends LinearOpMode {
                 break;
         }
 
+
+    }
+
+    public void LiftControl(){
+
+        if (gamepad1.left_trigger > 0){
+
+            lift.setPower(.2);
+
+        }else if (gamepad1.right_trigger > 0){
+
+            lift.setPower(-.2);
+        }else{
+
+            lift.setPower(0);
+        }
 
     }
 

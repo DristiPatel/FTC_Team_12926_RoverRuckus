@@ -25,9 +25,9 @@ public class HardwareRobot {
 
     public DcMotor liftMotor, extensionMotor, rotationMotor, collectionMotor; //motors for the other functions of the robot
 
-    public Servo latch; //servo for the latch feature of the robot
+    public Servo markerServo; //servo for the latch feature of the robot
 
-    public ColorSensor colorSensor; //color sensor to test robots
+
 
     //Constructors
     /**
@@ -43,6 +43,12 @@ public class HardwareRobot {
 
         frontRight.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
+
+        liftMotor = hwmp.dcMotor.get("Lift Motor");
+        extensionMotor = hwmp.dcMotor.get("Extension Motor");
+        rotationMotor = hwmp.dcMotor.get("Rotation Motor");
+        collectionMotor = hwmp.dcMotor.get("Collection Motor");
+        markerServo = hwmp.servo.get("Marker Servo");
 
     }
     //Mutator methods
@@ -60,7 +66,7 @@ public class HardwareRobot {
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        collectionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
 
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -70,7 +76,7 @@ public class HardwareRobot {
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rotationMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        collectionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
     }
 
