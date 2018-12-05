@@ -25,7 +25,7 @@ public class HardwareRobot {
 
     public DcMotor liftMotor, extensionMotor, rotationMotor, collectionMotor; //motors for the other functions of the robot
 
-    public Servo markerServo; //servo for the latch feature of the robot
+    //public Servo markerServo; //servo for the latch feature of the robot
 
 
 
@@ -48,7 +48,9 @@ public class HardwareRobot {
         extensionMotor = hwmp.dcMotor.get("Extension Motor");
         rotationMotor = hwmp.dcMotor.get("Rotation Motor");
         collectionMotor = hwmp.dcMotor.get("Collection Motor");
-        markerServo = hwmp.servo.get("Marker Servo");
+        //markerServo = hwmp.servo.get("Marker Servo");
+
+        ResetAllEncoders();
 
     }
     //Mutator methods

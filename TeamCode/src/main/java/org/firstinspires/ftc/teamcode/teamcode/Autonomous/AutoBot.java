@@ -35,7 +35,7 @@ public class AutoBot extends AutonomousRobot{
         //Align and knock off gold cube.
         GoldAlign();
 
-        //KnockGold();
+        //knock off gold, keep driving if going into crater, else stop in front of depot;
         KnockGold();
 
 

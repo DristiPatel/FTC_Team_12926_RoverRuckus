@@ -18,40 +18,39 @@ public class MainTeleOp extends OpMode {
 
     }
 
-
+    //unused, here if we want to set certain encoder positions for the lift and arm
     private enum LiftPosition{
-
-
     }
 
     private enum ArmExtensionPosition{
-
-
     }
 
     private enum ArmRotationPosition{
-
     }
+
+    //fields to control the postiion of the grabber, also unused
+    private LiftPosition liftPosition;
+    private ArmExtensionPosition armExtensionPosition;
+    private ArmRotationPosition armRotationPosition;
+
 
 
     //fields to control speed of drive train
     private DriveSpeed driveSpeed;
     private double speedMod;
 
-    //fields to control the postiion of the grabber
-    private LiftPosition liftPosition;
-    private ArmExtensionPosition armExtensionPosition;
-    private ArmRotationPosition armRotationPosition;
 
-
+    //declare the robot!
     HardwareRobot robot;
 
 
     @Override
     public void init(){
 
+        //map the robot hardware
         robot = new HardwareRobot(hardwareMap);
 
+        //set the drive speed to default
         driveSpeed = DriveSpeed.FAST;
         speedMod = 1;
     }
@@ -66,6 +65,8 @@ public class MainTeleOp extends OpMode {
         ArmRotationControl();
 
         ArmExtensionControl();
+
+        GrabControl();
 
         telemetry.addData("Speed:  ", speedMod);
         telemetry.addData("Lift Position", robot.liftMotor.getCurrentPosition());
@@ -117,6 +118,7 @@ public class MainTeleOp extends OpMode {
             driveSpeed = DriveSpeed.FAST;
         }
 
+        //set the speed multiplier based on enum
         switch (driveSpeed){
 
             case SLOW: speedMod = .5;
@@ -136,7 +138,6 @@ public class MainTeleOp extends OpMode {
     public void LiftControl() {
 
         final int MAX_POSITION = 3750;
-        final int MID_POSITION = 1750;
         final int MIN_POSITION = 250;
 
         if (gamepad2.dpad_up){
@@ -157,7 +158,6 @@ public class MainTeleOp extends OpMode {
     public void ArmRotationControl(){
 
         final int MAX_POSITION = 3750;
-        final int MID_POSITION = 1750;
         final int MIN_POSITION = 250;
 
         if (gamepad2.right_stick_y != 0) {
@@ -166,19 +166,18 @@ public class MainTeleOp extends OpMode {
 
                 robot.rotationMotor.setPower(-gamepad2.right_stick_y * 0.2);
 
-            } else {
+            }else {
 
                 robot.rotationMotor.setPower(0);
             }
-
         }
 
+        robot.rotationMotor.setPower(0);
     }
 
     public void ArmExtensionControl(){
 
         final int MAX_POSITION = 3750;
-        final int MID_POSITION = 1750;
         final int MIN_POSITION = 250;
 
         if (gamepad2.left_stick_y != 0) {
@@ -193,6 +192,7 @@ public class MainTeleOp extends OpMode {
             }
 
         }
+        robot.extensionMotor.setPower(0);
     }
 
     //left and right triggers for intake/outtake, else stop collection motor

@@ -155,14 +155,14 @@ public class AutonomousRobot extends LinearOpMode {
     void DriveToSampling(){
 
 
-        if(location == AutoPosition.RED_CLOSE || location == AutoPosition.BLUE_CLOSE) {
-            DriveByTime(1.25, .4, 0);
-            DriveByTime(1.3, .4, 270);
-        }else{
-            DriveByTime(1.25, .4, 0);
+       // if(location == AutoPosition.RED_CLOSE || location == AutoPosition.BLUE_CLOSE) {
+            DriveByTime(1.25, .4, 180);
             DriveByTime(1.3, .4, 90);
+       // }else{
+        //    DriveByTime(1.25, .4, 180);
+        //    DriveByTime(1.3, .4, 270);
 
-        }
+      //  }
     }
 
     //keep driving left until aligned with the gold block
@@ -175,20 +175,20 @@ public class AutonomousRobot extends LinearOpMode {
 
         while (!dogevuforia.getIsAligned() && runTime.seconds() <= stopTime) {
 
-            if(location == AutoPosition.RED_CLOSE || location == AutoPosition.BLUE_CLOSE) {
+            //if(location == AutoPosition.RED_CLOSE || location == AutoPosition.BLUE_CLOSE) {
                 //move left until aligned
-                robot.frontLeft.setPower(.2);
-                robot.frontRight.setPower(.2);
-                robot.backLeft.setPower(.2);
-                robot.backRight.setPower(.2);
-            }else{
-                //move right until aligned
                 robot.frontLeft.setPower(-.2);
                 robot.frontRight.setPower(-.2);
                 robot.backLeft.setPower(-.2);
                 robot.backRight.setPower(-.2);
+            //}else{
+                //move right until aligned
+              /**  robot.frontLeft.setPower(.2);
+                robot.frontRight.setPower(.2);
+                robot.backLeft.setPower(.2);
+                robot.backRight.setPower(.2);
 
-            }
+            }**/
         }
 
         //stop robot if no gold cube in sight or aligned
@@ -198,21 +198,23 @@ public class AutonomousRobot extends LinearOpMode {
 
     }
 
-    //drive forward to knock off gold cube and drive back
+    //drive forward to knock off gold cube, keep driving if going into crater, otherwise stop and place marker (unfinished)
     void KnockGold(){
 
         if (location == AutoPosition.RED_CLOSE || location == AutoPosition.BLUE_CLOSE) {
 
+            //this should drive far enough into the crater
             DriveByTime(3, .4, 0);
 
         }else{
 
-
+            //add code for stopping and placing the marker
 
         }
     }
 
 
+    //dont use this code for now, planning for vuforia implementation later
     void DriveToCenter(){
 
         if (location == AutoPosition.RED_CLOSE || location == AutoPosition.BLUE_CLOSE){
