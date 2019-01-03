@@ -6,6 +6,8 @@ import com.disnodeteam.dogecv.Dogeforia;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
 import com.disnodeteam.dogecv.filters.LeviColorFilter;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -27,7 +29,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
 
-public class DogeVuforia {
+public class DogeVuforia extends AutonomousRobot{
 
     private static final float mmPerInch        = 25.4f;
     private static final float mmFTCFieldWidth  = (12*6) * mmPerInch;       // the width of the FTC field (from the center point to the outer panels)
@@ -42,6 +44,7 @@ public class DogeVuforia {
     private OpenGLMatrix lastLocation = null;
     boolean targetVisible;
     Dogeforia vuforia;
+    WebcamName webcamName;
     List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
 
     //Detector object
@@ -49,13 +52,17 @@ public class DogeVuforia {
 
     public DogeVuforia(HardwareMap hardwareMap) {
 
+        webcamName = hardwareMap.get(WebcamName.class, "Webcam");
+
         // Setup camera and Vuforia parameters
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         // Set Vuforia parameters
-        parameters.vuforiaLicenseKey = "ASoV6Tf/////AAAAGRZhbgQAHUXIvHRThX8A4RoPYxjWj7xIsAP73KuOev4KQYeEG8dJ1BXk2uf/X+kjykEQXoVJ6o0Fr74BwyYOO3JrwP3KVVoQseVLUkdTJEAuuShwsikLRI4jVX5cFPdkWycxzr0mf5pLXY1EshMgaAKvE8rk/voAz23TETigsmCPy4BsrArViA+zHDA5271QJVRBc/sxjD6lPB1TGNvsW9sN7mHdNWl1eh0eJ+uSiGjIOmhbj5JP8wdvXvgfGsiWv1if5rWi+uJhybPe45SbtLXWSrU6EQnJk1gj8bQ1D8LFTQwebsWolqH23onsw0PHs+H9Bq79a0eG+lirdsnlbkmg8rK0ugARSOTVAbc2eNPc";
+        parameters.vuforiaLicenseKey = "AUcT85z/////AAABmXGQ0oInRUkXsRTFSp7CBPwiufAFJGymZ6iN3hIBAJ7l1B+clsyRgcBZBDlt8+3kJoYMRDqqdd42DUxzrcyxIHQ5NWezd8HdQsTIBaMfZY3xI8091/cVWZcesnMLx4hc6O7cq0dRCsafSEmhDfIxZkYPY/08411QPuGwzST/pYBVphiD6496MSPAuhAFzRIXmxDiGVGNfS/JILV46ndA9pd95eGHsD4WmtQ77lrAy7WjK0PPUp/DDPqF98B5PCc7OWyxGyt5iyRzRzFIvFs+QhlqNPGNHti+FlA/VkvL3mBsqUMssdaBFpueBnhjS5krydY5zfKv8mtrRsWDmn1dK5UDh2ZsgoamtwBjHJgkDzLR";
         parameters.fillCameraMonitorViewParent = true;
+
+        parameters.cameraName = webcamName;
 
         // Init Dogeforia
         vuforia = new Dogeforia(parameters);
@@ -114,11 +121,11 @@ public class DogeVuforia {
         }
 
         //Activate targets
-        targetsRoverRuckus.activate();
+        //targetsRoverRuckus.activate();
 
 
         detector = new GoldAlignDetector(); // Create detector
-        detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance()); // Initialize it with the app context and camera
+        detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance(), 0, true); // Initialize it with the app context and camera
         detector.useDefaults(); // Set detector to use default settings
 
         // Optional tuning
@@ -132,6 +139,11 @@ public class DogeVuforia {
 
         detector.ratioScorer.weight = 5; //
         detector.ratioScorer.perfectRatio = 1.0; // Ratio adjustment
+
+        vuforia.setDogeCVDetector(detector);
+        vuforia.enableDogeCV();
+        vuforia.showDebug();
+        vuforia.start();
 
     }
 
@@ -187,6 +199,10 @@ public class DogeVuforia {
                 //Target not in sight
                 targetVisible = false;
             }
+
+            if(!opModeIsActive())
+                break;
+
         }
 
     }

@@ -8,13 +8,13 @@ import org.firstinspires.ftc.teamcode.teamcode.Testers.MecanumTest;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import java.lang.Math;
 
-@TeleOp(name="Main TeleOop placeholder", group="Linear Opmode")
+@TeleOp(name="Main TeleOop", group="Linear Opmode")
 public class MainTeleOp extends OpMode {
 
 
     private enum DriveSpeed{
 
-        SLOW, FAST
+        SLOWEST, SLOW, FAST
 
     }
 
@@ -26,12 +26,17 @@ public class MainTeleOp extends OpMode {
     }
 
     private enum ArmRotationPosition{
+
+        LOWERED, RAISED, SUCKER, TO_LOWERED, TO_RAISED, TO_SUCKER, STATIC, MANUAL
+
     }
 
     //fields to control the postiion of the grabber, also unused
     private LiftPosition liftPosition;
     private ArmExtensionPosition armExtensionPosition;
+
     private ArmRotationPosition armRotationPosition;
+    private int manualPosition;
 
 
 
@@ -53,6 +58,12 @@ public class MainTeleOp extends OpMode {
         //set the drive speed to default
         driveSpeed = DriveSpeed.FAST;
         speedMod = 1;
+
+        //robot.rotationMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //robot.rotationMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        armRotationPosition = ArmRotationPosition.LOWERED;
+        manualPosition = 0;
     }
 
     @Override
@@ -60,18 +71,20 @@ public class MainTeleOp extends OpMode {
 
         DriveControl();
 
-        LiftControl();
+        //LiftControl();
 
-        ArmRotationControl();
+        //ArmRotationControl();
 
-        ArmExtensionControl();
+        //ArmExtensionControl();
 
-        GrabControl();
+        //GrabControl();
 
         telemetry.addData("Speed:  ", speedMod);
-        telemetry.addData("Lift Position", robot.liftMotor.getCurrentPosition());
-        telemetry.addData("Extension Position", robot.extensionMotor.getCurrentPosition());
-        telemetry.addData("Rotation Position", robot.rotationMotor.getCurrentPosition());
+        //telemetry.addData("Lift Position", robot.liftMotor.getCurrentPosition());
+        //telemetry.addData("Extension Position", robot.extensionMotor.getCurrentPosition());
+        //telemetry.addData("Rotation Position", robot.rotationMotor.getCurrentPosition());
+        //telemetry.addData("Rotation Position name  ", armRotationPosition);
+        //telemetry.addData("target position: ", robot.rotationMotor.getTargetPosition());
         telemetry.update();
 
 
@@ -87,21 +100,6 @@ public class MainTeleOp extends OpMode {
 
 
 
-        //Reverse the y coordinate
-        double x1 = gamepad1.left_stick_x;
-        double y1 = -gamepad1.left_stick_y;
-        float x2 = gamepad1.right_stick_x;
-
-
-        //trig implementation
-        double power = Math.hypot(x1, y1);
-        double angle = Math.atan2(y1, x1) - Math.PI/4;
-
-        robot.frontLeft.setPower(speedMod*(power * Math.cos(angle) + x2));
-        robot.frontRight.setPower(speedMod*(power * Math.sin(angle) - x2));
-        robot.backLeft.setPower(speedMod*(power * Math.sin(angle) + x2));
-        robot.backRight.setPower(speedMod*(power * Math.cos(angle) - x2));
-
 
     }
 
@@ -109,13 +107,18 @@ public class MainTeleOp extends OpMode {
     //Check first controller d-pad for speed modifier
     public void CheckSpeed(){
 
-        if (gamepad1.dpad_down && driveSpeed == DriveSpeed.FAST) {
+        if (gamepad1.dpad_down) {
 
             driveSpeed = DriveSpeed.SLOW;
 
-        } else if (gamepad1.dpad_up && driveSpeed == DriveSpeed.SLOW) {
+        } else if (gamepad1.dpad_up ) {
 
             driveSpeed = DriveSpeed.FAST;
+
+        }else if (gamepad1.dpad_left ){
+
+            driveSpeed = DriveSpeed.SLOWEST;
+
         }
 
         //set the speed multiplier based on enum
@@ -125,6 +128,10 @@ public class MainTeleOp extends OpMode {
                         break;
 
             case FAST: speedMod = 1;
+                        break;
+
+            case SLOWEST: speedMod = .25;
+
                         break;
         }
 
@@ -138,16 +145,16 @@ public class MainTeleOp extends OpMode {
     public void LiftControl() {
 
         final int MAX_POSITION = 3750;
-        final int MIN_POSITION = 250;
+        final int MIN_POSITION = 0;
 
-        if (gamepad2.dpad_up){
+        if (gamepad2.dpad_up ){
 
-            robot.liftMotor.setPower(.2);
+            robot.liftMotor.setPower(-.2);
 
 
         }else if (gamepad2.dpad_down){
 
-            robot.liftMotor.setPower(-.2);
+            robot.liftMotor.setPower(.2);
         }else{
 
             robot.liftMotor.setPower(0);
@@ -155,44 +162,145 @@ public class MainTeleOp extends OpMode {
 
     }
 
-    public void ArmRotationControl(){
+    public void CheckArmRotationControl() {
 
-        final int MAX_POSITION = 3750;
-        final int MIN_POSITION = 250;
 
-        if (gamepad2.right_stick_y != 0) {
+        if (gamepad2.b) {
 
-            if (robot.rotationMotor.getCurrentPosition() > MIN_POSITION && robot.rotationMotor.getCurrentPosition() < MAX_POSITION) {
+            armRotationPosition = ArmRotationPosition.TO_LOWERED;
 
-                robot.rotationMotor.setPower(-gamepad2.right_stick_y * 0.2);
+        } else if (gamepad2.y) {
 
-            }else {
+            armRotationPosition = ArmRotationPosition.TO_RAISED;
 
-                robot.rotationMotor.setPower(0);
-            }
+        } else if (gamepad2.x) {
+
+            armRotationPosition = ArmRotationPosition.TO_SUCKER;
+
+        }else if (gamepad2.right_stick_y != 0){
+
+            armRotationPosition = ArmRotationPosition.MANUAL;
+
         }
 
-        robot.rotationMotor.setPower(0);
+        if(!gamepad2.b && armRotationPosition == ArmRotationPosition.TO_LOWERED){
+
+            armRotationPosition = ArmRotationPosition.LOWERED;
+
+        }else if(!gamepad2.y && armRotationPosition == ArmRotationPosition.TO_RAISED){
+
+            armRotationPosition = ArmRotationPosition.RAISED;
+
+        }else if(!gamepad2.x && armRotationPosition == ArmRotationPosition.TO_SUCKER){
+
+            armRotationPosition = ArmRotationPosition.SUCKER;
+        }
+
+    }
+
+
+    public void ArmRotationControl(){
+
+        final int SUCKER_POSITION = 390;
+        final int MAX_POSITION = 130;
+        final int MIN_POSITION = 20;
+        final double power = .8;
+
+
+        CheckArmRotationControl();
+
+        switch(armRotationPosition){
+
+            case LOWERED:
+
+                if (robot.rotationMotor.getCurrentPosition() > 20) {
+                    robot.rotationMotor.setTargetPosition(MIN_POSITION);
+                    robot.rotationMotor.setPower(power);
+
+                }else{
+
+                    armRotationPosition = ArmRotationPosition.STATIC;
+                }
+                manualPosition = MIN_POSITION;
+
+               break;
+
+            case RAISED:
+
+
+                    robot.rotationMotor.setTargetPosition(MAX_POSITION);
+                    robot.rotationMotor.setPower(power);
+                    manualPosition = MAX_POSITION;
+                    
+                break;
+
+            case SUCKER:
+
+                //if(robot.rotationMotor.getCurrentPosition() < SUCKER_POSITION) {
+                    robot.rotationMotor.setTargetPosition(SUCKER_POSITION);
+                    robot.rotationMotor.setPower(power);
+                    manualPosition = SUCKER_POSITION;
+                //}else{
+
+                  //  armRotationPosition = ArmRotationPosition.STATIC;
+                //}
+                break;
+
+            case STATIC:
+                robot.rotationMotor.setPower(0);
+                break;
+
+            case MANUAL:
+
+                if (gamepad2.dpad_up || gamepad2.dpad_down){
+
+                    if(gamepad2.dpad_down) {
+                        manualPosition +=2;
+                        robot.rotationMotor.setTargetPosition(manualPosition);
+                        robot.rotationMotor.setPower(power);
+                    }else {
+                        manualPosition-=2;
+                        robot.rotationMotor.setTargetPosition(manualPosition);
+                        robot.rotationMotor.setPower(power);
+
+                    }
+                }else{
+
+                    robot.rotationMotor.setTargetPosition(manualPosition);
+                    robot.rotationMotor.setPower(power);
+                }
+                break;
+
+        }
+
     }
 
     public void ArmExtensionControl(){
 
-        final int MAX_POSITION = 3750;
-        final int MIN_POSITION = 250;
+        final int MAX_POSITION = 1100;
+        final int MIN_POSITION = -100;
+        final double power = .6;
 
-        if (gamepad2.left_stick_y != 0) {
+        if (gamepad2.left_stick_y < 0 ) {
 
-            if (robot.extensionMotor.getCurrentPosition() > MIN_POSITION && robot.extensionMotor.getCurrentPosition() < MAX_POSITION) {
 
-                robot.extensionMotor.setPower(-gamepad2.left_stick_y * 0.2);
+            robot.extensionMotor.setTargetPosition(MAX_POSITION);
+            robot.extensionMotor.setPower(-gamepad2.left_stick_y * power);
 
-            } else {
+        }else if(gamepad2.left_stick_y > 0 ) {
 
-                robot.extensionMotor.setPower(0);
-            }
 
+            robot.extensionMotor.setTargetPosition(MIN_POSITION);
+            robot.extensionMotor.setPower(-gamepad2.left_stick_y * power);
+
+        }else{
+
+            robot.extensionMotor.setPower(0);
         }
-        robot.extensionMotor.setPower(0);
+
+
+
+
     }
 
     //left and right triggers for intake/outtake, else stop collection motor
@@ -201,11 +309,13 @@ public class MainTeleOp extends OpMode {
         if (gamepad2.left_trigger != 0){
             robot.collectionMotor.setPower(-gamepad2.left_trigger * .7);
 
-        } else if(gamepad2.right_trigger != 0){
+        }
+        if(gamepad2.right_trigger != 0){
 
-            robot.collectionMotor.setPower(gamepad2.left_trigger * .7);
+            robot.collectionMotor.setPower(gamepad2.right_trigger * .7);
 
-        } else {
+        }
+        if (gamepad2.left_trigger == 0 && gamepad2.right_trigger == 0){
 
             robot.collectionMotor.setPower(0);
 

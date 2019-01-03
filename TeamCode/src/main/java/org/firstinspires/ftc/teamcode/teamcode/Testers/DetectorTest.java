@@ -5,11 +5,13 @@ import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.teamcode.Autonomous.AutonomousRobot;
 
 @Autonomous(name = "doge test", group = "Autonomous")
 
+@Disabled
 public class DetectorTest extends AutonomousRobot {
 
     private GoldAlignDetector detector;

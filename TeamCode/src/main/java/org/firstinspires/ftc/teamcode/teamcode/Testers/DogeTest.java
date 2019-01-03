@@ -6,6 +6,7 @@ import com.disnodeteam.dogecv.CameraViewDisplay;
 import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
 import com.disnodeteam.dogecv.detectors.roverrukus.SamplingOrderDetector;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -16,7 +17,7 @@ import org.firstinspires.ftc.teamcode.teamcode.HardwareRobot;
 
 @TeleOp(name = "Doge scoot follow gold", group = "Doge")
 
-
+@Disabled
 public class DogeTest extends LinearOpMode {
 
     private DcMotor frontLeft, frontRight, backLeft, backRight;

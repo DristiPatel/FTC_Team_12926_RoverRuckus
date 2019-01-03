@@ -10,6 +10,7 @@ import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
 import com.disnodeteam.dogecv.filters.LeviColorFilter;
 import com.disnodeteam.dogecv.scoring.MaxAreaScorer;
 import com.disnodeteam.dogecv.scoring.RatioScorer;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -48,7 +49,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Vuforia Phone Testing with Drive", group="DogeCV")
+@TeleOp(name="Vuforia Webcam Testing with Drive", group="DogeCV")
+
 
 public class VuforiaTest extends OpMode {
 
@@ -91,6 +93,9 @@ public class VuforiaTest extends OpMode {
     @Override
     public void init() {
 
+        //initialize webcam
+        webcamName = hardwareMap.get(WebcamName.class, "Webcam");
+
         frontLeft = hardwareMap.get(DcMotor.class, "Front Left");
         frontRight = hardwareMap.get(DcMotor.class, "Front Right");
         backLeft = hardwareMap.get(DcMotor.class, "Back Left");
@@ -111,8 +116,10 @@ public class VuforiaTest extends OpMode {
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         // Set Vuforia parameters
-        parameters.vuforiaLicenseKey = "ASoV6Tf/////AAAAGRZhbgQAHUXIvHRThX8A4RoPYxjWj7xIsAP73KuOev4KQYeEG8dJ1BXk2uf/X+kjykEQXoVJ6o0Fr74BwyYOO3JrwP3KVVoQseVLUkdTJEAuuShwsikLRI4jVX5cFPdkWycxzr0mf5pLXY1EshMgaAKvE8rk/voAz23TETigsmCPy4BsrArViA+zHDA5271QJVRBc/sxjD6lPB1TGNvsW9sN7mHdNWl1eh0eJ+uSiGjIOmhbj5JP8wdvXvgfGsiWv1if5rWi+uJhybPe45SbtLXWSrU6EQnJk1gj8bQ1D8LFTQwebsWolqH23onsw0PHs+H9Bq79a0eG+lirdsnlbkmg8rK0ugARSOTVAbc2eNPc";
+        parameters.vuforiaLicenseKey = "AUcT85z/////AAABmXGQ0oInRUkXsRTFSp7CBPwiufAFJGymZ6iN3hIBAJ7l1B+clsyRgcBZBDlt8+3kJoYMRDqqdd42DUxzrcyxIHQ5NWezd8HdQsTIBaMfZY3xI8091/cVWZcesnMLx4hc6O7cq0dRCsafSEmhDfIxZkYPY/08411QPuGwzST/pYBVphiD6496MSPAuhAFzRIXmxDiGVGNfS/JILV46ndA9pd95eGHsD4WmtQ77lrAy7WjK0PPUp/DDPqF98B5PCc7OWyxGyt5iyRzRzFIvFs+QhlqNPGNHti+FlA/VkvL3mBsqUMssdaBFpueBnhjS5krydY5zfKv8mtrRsWDmn1dK5UDh2ZsgoamtwBjHJgkDzLR";
         parameters.fillCameraMonitorViewParent = true;
+
+        parameters.cameraName = webcamName;
 
         // Init Dogeforia
         vuforia = new Dogeforia(parameters);

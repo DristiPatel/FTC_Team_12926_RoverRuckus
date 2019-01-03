@@ -21,11 +21,11 @@ public class HardwareRobot {
 
 
     //Instance Fields
-    public DcMotor frontLeft, frontRight, backLeft, backRight; //motors for the wheels
+    public DcMotor leftDrive, rightDrive, strafeDrive;
 
     public DcMotor liftMotor, extensionMotor, rotationMotor, collectionMotor; //motors for the other functions of the robot
 
-    //public Servo markerServo; //servo for the latch feature of the robot
+    public Servo markerServo; //servo for the latch feature of the robot
 
 
 
@@ -36,22 +36,24 @@ public class HardwareRobot {
      */
     public HardwareRobot(HardwareMap hwmp){
 
-        frontLeft = hwmp.dcMotor.get("Front Left");
-        frontRight = hwmp.dcMotor.get("Front Right");
-        backLeft = hwmp.dcMotor.get("Back Left");
-        backRight = hwmp.dcMotor.get("Back Right");
+        leftDrive = hwmp.dcMotor.get("Left Drive");
+        rightDrive = hwmp.dcMotor.get("Right Drive");
+        strafeDrive = hwmp.dcMotor.get("Strafe Drive");
 
-        frontRight.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.REVERSE);
+        rightDrive.setDirection(DcMotor.Direction.REVERSE);
 
+
+        /*
         liftMotor = hwmp.dcMotor.get("Lift Motor");
         extensionMotor = hwmp.dcMotor.get("Extension Motor");
         rotationMotor = hwmp.dcMotor.get("Rotation Motor");
         collectionMotor = hwmp.dcMotor.get("Collection Motor");
-        //markerServo = hwmp.servo.get("Marker Servo");
+        markerServo = hwmp.servo.get("Marker Servo");
+
+
 
         ResetAllEncoders();
-
+*/
     }
     //Mutator methods
     /**
@@ -60,20 +62,18 @@ public class HardwareRobot {
     public void ResetAllEncoders(){
 
 
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
 
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -89,15 +89,13 @@ public class HardwareRobot {
 
         StopDriveMotors();
 
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
 
     }
@@ -120,10 +118,9 @@ public class HardwareRobot {
      */
     public void StopDriveMotors(){
 
-        backLeft.setPower(0);
-        backRight.setPower(0);
-        frontRight.setPower(0);
-        frontLeft.setPower(0);
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+
 
     }
 
