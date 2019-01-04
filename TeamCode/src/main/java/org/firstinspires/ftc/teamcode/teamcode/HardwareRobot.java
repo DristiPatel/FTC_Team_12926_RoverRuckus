@@ -43,8 +43,10 @@ public class HardwareRobot {
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
 
 
-        /*
         liftMotor = hwmp.dcMotor.get("Lift Motor");
+
+
+        /*
         extensionMotor = hwmp.dcMotor.get("Extension Motor");
         rotationMotor = hwmp.dcMotor.get("Rotation Motor");
         collectionMotor = hwmp.dcMotor.get("Collection Motor");

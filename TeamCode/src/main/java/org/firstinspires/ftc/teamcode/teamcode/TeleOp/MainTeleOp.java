@@ -22,18 +22,14 @@ public class MainTeleOp extends OpMode {
     private enum LiftPosition{
     }
 
-    private enum ArmExtensionPosition{
-    }
-
     private enum ArmRotationPosition{
 
-        LOWERED, RAISED, SUCKER, TO_LOWERED, TO_RAISED, TO_SUCKER, STATIC, MANUAL
+        LOWERED, RAISED, TO_LOWERED, TO_RAISED, STATIC, MANUAL
 
     }
 
     //fields to control the postiion of the grabber, also unused
-    private LiftPosition liftPosition;
-    private ArmExtensionPosition armExtensionPosition;
+
 
     private ArmRotationPosition armRotationPosition;
     private int manualPosition;
@@ -62,8 +58,8 @@ public class MainTeleOp extends OpMode {
         //robot.rotationMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         //robot.rotationMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        armRotationPosition = ArmRotationPosition.LOWERED;
-        manualPosition = 0;
+        //armRotationPosition = ArmRotationPosition.LOWERED;
+        //manualPosition = 0;
     }
 
     @Override
@@ -71,7 +67,7 @@ public class MainTeleOp extends OpMode {
 
         DriveControl();
 
-        //LiftControl();
+        LiftControl();
 
         //ArmRotationControl();
 
@@ -80,7 +76,7 @@ public class MainTeleOp extends OpMode {
         //GrabControl();
 
         telemetry.addData("Speed:  ", speedMod);
-        //telemetry.addData("Lift Position", robot.liftMotor.getCurrentPosition());
+        telemetry.addData("Lift Position", robot.liftMotor.getCurrentPosition());
         //telemetry.addData("Extension Position", robot.extensionMotor.getCurrentPosition());
         //telemetry.addData("Rotation Position", robot.rotationMotor.getCurrentPosition());
         //telemetry.addData("Rotation Position name  ", armRotationPosition);
@@ -98,7 +94,10 @@ public class MainTeleOp extends OpMode {
         //sets the speedMod by checking for speed adjustments via d-pad
         CheckSpeed();
 
+        robot.leftDrive.setPower(speedMod*(-gamepad1.left_stick_y + gamepad1.right_stick_x));
+        robot.rightDrive.setPower(speedMod*(-gamepad1.left_stick_y - gamepad1.right_stick_x));
 
+        robot.strafeDrive.setPower(speedMod*(gamepad1.left_stick_x));
 
 
     }
@@ -138,7 +137,7 @@ public class MainTeleOp extends OpMode {
 
     }
 
-    //constants for encoder values
+
 
 
     //Second controller joysticks (left for linear, right for rotation)
@@ -149,12 +148,12 @@ public class MainTeleOp extends OpMode {
 
         if (gamepad2.dpad_up ){
 
-            robot.liftMotor.setPower(-.2);
+            robot.liftMotor.setPower(-.4);
 
 
         }else if (gamepad2.dpad_down){
 
-            robot.liftMotor.setPower(.2);
+            robot.liftMotor.setPower(.4);
         }else{
 
             robot.liftMotor.setPower(0);
@@ -173,9 +172,9 @@ public class MainTeleOp extends OpMode {
 
             armRotationPosition = ArmRotationPosition.TO_RAISED;
 
-        } else if (gamepad2.x) {
+        //} else if (gamepad2.x) {
 
-            armRotationPosition = ArmRotationPosition.TO_SUCKER;
+           // armRotationPosition = ArmRotationPosition.TO_SUCKER;
 
         }else if (gamepad2.right_stick_y != 0){
 
@@ -191,9 +190,9 @@ public class MainTeleOp extends OpMode {
 
             armRotationPosition = ArmRotationPosition.RAISED;
 
-        }else if(!gamepad2.x && armRotationPosition == ArmRotationPosition.TO_SUCKER){
+       // }else if(!gamepad2.x && armRotationPosition == ArmRotationPosition.TO_SUCKER){
 
-            armRotationPosition = ArmRotationPosition.SUCKER;
+           // armRotationPosition = ArmRotationPosition.SUCKER;
         }
 
     }
@@ -234,17 +233,17 @@ public class MainTeleOp extends OpMode {
                     
                 break;
 
-            case SUCKER:
+           // case SUCKER:
 
                 //if(robot.rotationMotor.getCurrentPosition() < SUCKER_POSITION) {
-                    robot.rotationMotor.setTargetPosition(SUCKER_POSITION);
-                    robot.rotationMotor.setPower(power);
-                    manualPosition = SUCKER_POSITION;
+              //      robot.rotationMotor.setTargetPosition(SUCKER_POSITION);
+              //      robot.rotationMotor.setPower(power);
+              //      manualPosition = SUCKER_POSITION;
                 //}else{
 
                   //  armRotationPosition = ArmRotationPosition.STATIC;
                 //}
-                break;
+              //  break;
 
             case STATIC:
                 robot.rotationMotor.setPower(0);
@@ -331,9 +330,4 @@ public class MainTeleOp extends OpMode {
     }
 
 
-    //clamps values outside of the range to the min/max
-    private static double clamp(double val, double min, double max) {
-
-        return Math.max(min, Math.min(max, val));
-    }
 }
