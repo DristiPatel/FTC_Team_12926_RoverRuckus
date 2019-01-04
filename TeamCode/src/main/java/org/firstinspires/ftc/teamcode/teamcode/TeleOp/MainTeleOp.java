@@ -146,12 +146,12 @@ public class MainTeleOp extends OpMode {
         final int MAX_POSITION = 3750;
         final int MIN_POSITION = 0;
 
-        if (gamepad2.dpad_up ){
+        if (gamepad2.dpad_down ){
 
             robot.liftMotor.setPower(-.4);
 
 
-        }else if (gamepad2.dpad_down){
+        }else if (gamepad2.dpad_up){
 
             robot.liftMotor.setPower(.4);
         }else{
@@ -322,12 +322,6 @@ public class MainTeleOp extends OpMode {
 
     }
 
-    //stop all motors
-    public void stop(){
-
-        robot.StopAllMotors();
-
-    }
 
 
 }
