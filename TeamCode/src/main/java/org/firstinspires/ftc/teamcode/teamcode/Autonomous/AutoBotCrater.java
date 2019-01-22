@@ -29,100 +29,62 @@ public class AutoBotCrater extends AutonomousRobot {
 
         //SetServo();
 
-        dogevuforia.StartDoge();
-        //WAIT FOR START
         waitForStart();
 
-        boolean run = true;
+        for (int i = 0; i < 1; i++) {
 
-        try {
+            int pos = robot.extensionMotor.getCurrentPosition();
 
-            while (run) {
+            robot.extensionMotor.setTargetPosition(pos);
+            robot.extensionMotor.setPower(.5);
 
-                run = false;
+            Unlatch();
 
-                //drive in front of right sample block
-                DriveToSampling();
-
-                if(!opModeIsActive())
-                    break;
-
-                runTime.reset();
-                //Align and knock off gold cube.
-                GoldAlign();
-
-                if(!opModeIsActive())
-                    break;
-
-
-                retractTime = runTime.seconds();
-
-                WaitFor(1);
-                //knock off gold, keep driving if going into crater, else stop in front of depot;
-
-                if(!opModeIsActive())
-                    break;
-
-
-                KnockGold();
-
-                if(!opModeIsActive())
-                    break;
-
-
-                runTime.reset();
-
-                DriveByTime(retractTime, .2, 90);
-
-                if(!opModeIsActive())
-                    break;
-
-/*
-                //new code
-                DriveByTime(2.15, .6, 270);
-
-                if(!opModeIsActive())
-                    break;
-
-
-                TurnByTime(1.89, .3);
-
-                if(!opModeIsActive())
-                    break;
-
-
-                DriveByTime(.45, .4, 90);
-
-                if(!opModeIsActive())
-                    break;
-
-
-                DriveByTime(2, .6, 180);
-
-                if(!opModeIsActive())
-                    break;
-
-
-                PlaceMarker();
-
-                if(!opModeIsActive())
-                    break;
-
-                DriveByTime(4, .6, 0);
-
-                if(!opModeIsActive())
-                    break;
-
-
-                idle();
-
-
-*/
+            if (!opModeIsActive()){
+                break;
             }
 
-        }catch(Exception e){robot.StopDriveMotors();}
-        finally {
-            stop();
+            DriveToSampling();
+
+            if (!opModeIsActive()){
+                break;
+            }
+
+            runTime.reset();
+
+            GoldAlign();
+
+            if (!opModeIsActive()){
+                break;
+            }
+
+            AbsoluteTurn(.2, 0);
+            AbsoluteTurn(.1, 0);
+
+            if (!opModeIsActive()){
+                break;
+            }
+
+            EncoderDrive(.8, 25, 25, 5);
+
+        /*
+        double retractTime = runTime.seconds();
+
+        KnockGold();
+
+        DriveByTime(retractTime, -.2);
+
+        EncoderDrive(.5, -10, -10, 5);
+
+        AbsoluteTurn(.1, 45);
+
+        EncoderDrive(.5, -10, -10, 5);
+
+        AbsoluteTurn(.1 , 135);
+
+        PlaceMarker();
+        */
+
         }
 
     }

@@ -10,15 +10,20 @@ import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
 import com.disnodeteam.dogecv.filters.LeviColorFilter;
 import com.disnodeteam.dogecv.scoring.MaxAreaScorer;
 import com.disnodeteam.dogecv.scoring.RatioScorer;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
@@ -55,13 +60,14 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 public class VuforiaTest extends OpMode {
 
 
+
     private enum DriveSpeed{
 
         SLOW, FAST
 
     }
 
-    private DcMotor frontLeft, frontRight, backLeft, backRight;
+    private DcMotor leftDrive, rightDrive, strafeDrive;
 
 
     private DriveSpeed driveSpeed;
@@ -90,20 +96,24 @@ public class VuforiaTest extends OpMode {
     //Detector object
     GoldAlignDetector detector;
 
+
+    //imu
+    BNO055IMU               imu;
+    Orientation angles = new Orientation();
+
     @Override
     public void init() {
 
         //initialize webcam
         webcamName = hardwareMap.get(WebcamName.class, "Webcam");
 
-        frontLeft = hardwareMap.get(DcMotor.class, "Front Left");
-        frontRight = hardwareMap.get(DcMotor.class, "Front Right");
-        backLeft = hardwareMap.get(DcMotor.class, "Back Left");
-        backRight = hardwareMap.get(DcMotor.class, "Back Right");
+        leftDrive = hardwareMap.get(DcMotor.class, "Left Drive");
+        rightDrive = hardwareMap.get(DcMotor.class, "Right Drive");
+        strafeDrive = hardwareMap.get(DcMotor.class, "Strafe Drive");
+
 
         //reverse a side of motors
-        frontRight.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.REVERSE);
+        rightDrive.setDirection(DcMotor.Direction.REVERSE);
 
 
         driveSpeed = DriveSpeed.FAST;
@@ -162,15 +172,15 @@ public class VuforiaTest extends OpMode {
 
 
         //Set camera displacement (NEEDS TO BE EDITIED)
-        final int CAMERA_FORWARD_DISPLACEMENT = -27-26;   // eg: Camera is 110 mm in front of robot center
-        final int CAMERA_VERTICAL_DISPLACEMENT = 181;   // eg: Camera is 200 mm above ground
-        final int CAMERA_LEFT_DISPLACEMENT = 219-14;     // eg: Camera is ON the robot's center line
+        final int CAMERA_FORWARD_DISPLACEMENT = 0;   // eg: Camera is 110 mm in front of robot center
+        final int CAMERA_VERTICAL_DISPLACEMENT = 280;   // eg: Camera is 200 mm above ground
+        final int CAMERA_LEFT_DISPLACEMENT = 135;     // eg: Camera is ON the robot's center line
 
         // Set phone location on robot
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES,
-                        -90, 0, 0));
+                        90, 0, 180));
 
         //Set info for the trackables
         for (VuforiaTrackable trackable : allTrackables) {
@@ -193,6 +203,23 @@ public class VuforiaTest extends OpMode {
         vuforia.enableDogeCV(); //Enable the DogeCV-Vuforia combo
         vuforia.showDebug(); // Show debug info
         vuforia.start(); // Start the detector
+
+
+
+        //imu stuffs
+        BNO055IMU.Parameters pars = new BNO055IMU.Parameters();
+
+        pars.mode                = BNO055IMU.SensorMode.IMU;
+        pars.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        pars.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        pars.loggingEnabled      = false;
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+
+        imu.initialize(pars);
     }
 
     /*
@@ -217,26 +244,12 @@ public class VuforiaTest extends OpMode {
     @Override
     public void loop() {
 
-
         CheckSpeed();
 
+        leftDrive.setPower(speedMod*(-gamepad1.left_stick_y + gamepad1.right_stick_x));
+        rightDrive.setPower(speedMod*(-gamepad1.left_stick_y - gamepad1.right_stick_x));
 
-        //telemetry.addData("Speed:  ", speedMod);
-        //telemetry.update();
-
-        double x1 = gamepad1.left_stick_x;
-        double y1 = -gamepad1.left_stick_y;
-        double x2 = -gamepad1.right_stick_x;
-
-
-        //trig implementation
-        double power = Math.hypot(x1, y1);
-        double angle = Math.atan2(y1, x1) - Math.PI/4;
-
-        frontLeft.setPower(speedMod*(power * Math.cos(angle) + x2));
-        frontRight.setPower(speedMod*(power * Math.sin(angle) - x2));
-        backLeft.setPower(speedMod*(power * Math.sin(angle) + x2));
-        backRight.setPower(speedMod*(power * Math.cos(angle) - x2));
+        strafeDrive.setPower(speedMod*(gamepad1.left_stick_x));
 
 
         //Assume we can't find a target
@@ -273,6 +286,13 @@ public class VuforiaTest extends OpMode {
             //No visible target
             telemetry.addData("Visible Target", "none");
         }
+
+
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        telemetry.addData("Z", angles.firstAngle);
+        telemetry.addData("Y", angles.secondAngle);
+        telemetry.addData("X", angles.thirdAngle);
+
         // Update telemetry
         telemetry.update();
     }

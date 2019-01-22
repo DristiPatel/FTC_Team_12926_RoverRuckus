@@ -105,15 +105,15 @@ public class DogeVuforia extends AutonomousRobot{
 
 
         //Set camera displacement (NEEDS TO BE EDITED)
-        final int CAMERA_FORWARD_DISPLACEMENT = -27-26;   // eg: Camera is 110 mm in front of robot center
-        final int CAMERA_VERTICAL_DISPLACEMENT = 181;   // eg: Camera is 200 mm above ground
-        final int CAMERA_LEFT_DISPLACEMENT = 219-14;     // eg: Camera is ON the robot's center line
+        final int CAMERA_FORWARD_DISPLACEMENT = 0;   // eg: Camera is 110 mm in front of robot center
+        final int CAMERA_VERTICAL_DISPLACEMENT = 280;   // eg: Camera is 200 mm above ground
+        final int CAMERA_LEFT_DISPLACEMENT = 135;     // eg: Camera is ON the robot's center line
 
         // Set phone location on robot
         OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES,
-                        -90, 0, 0));
+                        90, 0, 180));
 
         //Set info for the trackables
         for (VuforiaTrackable trackable : allTrackables) {

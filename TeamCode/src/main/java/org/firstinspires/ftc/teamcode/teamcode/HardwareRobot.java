@@ -11,6 +11,7 @@ package org.firstinspires.ftc.teamcode.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -23,9 +24,9 @@ public class HardwareRobot {
     //Instance Fields
     public DcMotor leftDrive, rightDrive, strafeDrive;
 
-    public DcMotor liftMotor, extensionMotor, rotationMotor, collectionMotor; //motors for the other functions of the robot
+    public DcMotor liftMotor, extensionMotor, collectionMotor;//, rotationMotor; //motors for the other functions of the robot
 
-    public Servo markerServo; //servo for the latch feature of the robot
+    public Servo markerServo, swingServo1, swingServo2, scoopServo, webcamServo; //servo for the latch feature of the robot
 
 
 
@@ -36,26 +37,37 @@ public class HardwareRobot {
      */
     public HardwareRobot(HardwareMap hwmp){
 
+
+        //DRIVE MOTORS
         leftDrive = hwmp.dcMotor.get("Left Drive");
         rightDrive = hwmp.dcMotor.get("Right Drive");
         strafeDrive = hwmp.dcMotor.get("Strafe Drive");
-
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
 
 
+        //OTHER MOTORS
         liftMotor = hwmp.dcMotor.get("Lift Motor");
 
-
-        /*
         extensionMotor = hwmp.dcMotor.get("Extension Motor");
-        rotationMotor = hwmp.dcMotor.get("Rotation Motor");
+
         collectionMotor = hwmp.dcMotor.get("Collection Motor");
+
+
+        //SERVOS
+        swingServo1 = hwmp.servo.get("Swing Servo1");
+        swingServo2 = hwmp.servo.get("Swing Servo2");
+
+        scoopServo = hwmp.servo.get("Scoop Servo");
+
+        webcamServo = hwmp.servo.get("Webcam Servo");
+
         markerServo = hwmp.servo.get("Marker Servo");
 
 
 
-        ResetAllEncoders();
-*/
+        //reset encoders
+        //ResetAllEncoders();
+
     }
     //Mutator methods
     /**
@@ -63,24 +75,18 @@ public class HardwareRobot {
      */
     public void ResetAllEncoders(){
 
-
-        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
+        ResetDriveEncoders();
 
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rotationMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-
-        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        collectionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rotationMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+        collectionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
 
@@ -93,12 +99,13 @@ public class HardwareRobot {
 
         leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        strafeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
 
 
         leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-
+        strafeDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
 
@@ -108,9 +115,10 @@ public class HardwareRobot {
     public void StopAllMotors(){
 
         StopDriveMotors();
+
         liftMotor.setPower(0);
         extensionMotor.setPower(0);
-        rotationMotor.setPower(0);
+
         collectionMotor.setPower(0);
 
     }
@@ -122,7 +130,15 @@ public class HardwareRobot {
 
         leftDrive.setPower(0);
         rightDrive.setPower(0);
+        strafeDrive.setPower(0);
 
+
+    }
+
+    public void ResetServos(){
+
+
+        scoopServo.setPosition(Servo.MIN_POSITION);
 
     }
 

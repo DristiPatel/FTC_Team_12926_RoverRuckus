@@ -28,7 +28,7 @@ public class AutoTest extends AutonomousRobot {
         //DriveByTime(2, .5, 180);
 
         TurnByTime(.25, -.5);
-
+/*
         DriveByTime(.5,.5,90);
         DriveByTime(.5,.5,180);
         DriveByTime(.5,.5,45);
@@ -36,7 +36,7 @@ public class AutoTest extends AutonomousRobot {
         TurnByTime(.25, .5);
 
 
-
+*/
 
 
     }

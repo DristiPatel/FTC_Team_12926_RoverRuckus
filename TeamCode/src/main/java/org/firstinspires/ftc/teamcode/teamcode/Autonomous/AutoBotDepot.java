@@ -28,48 +28,31 @@ public class AutoBotDepot extends AutonomousRobot{
 
         telemetry.update();
 
-        SetServo();
 
-        //dogevuforia.StartDoge();
-        //WAIT FOR START
         waitForStart();
 
-        //drive in front of right sample block
+        //Unlatch();
+
+
         DriveToSampling();
+
 
         runTime.reset();
 
-        //Align and knock off gold cube.
         GoldAlign();
 
-        retractTime = runTime.seconds();
-
-        WaitFor(1);
+        double retractTime = runTime.seconds();
 
         KnockGold();
 
-        runTime.reset();
-
-        DriveByTime(retractTime, .2, 90);
+        DriveByTime(retractTime, -.7);
 
 
-        DriveByTime(0.75, .6, 90);
 
-        WaitFor(.25);
 
-        TurnByTime(.765, .3);
-
-        DriveByTime(.5, .6, 90);
-
-        DriveByTime(3, .5, 180);
-
-        PlaceMarker();
-
-        //DriveByTime(2.2, .5, 0);
-
-        //DriveByTime(.7, .6, 270);
 
 
     }
+
 
 }

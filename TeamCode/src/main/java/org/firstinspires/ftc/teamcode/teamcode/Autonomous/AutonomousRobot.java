@@ -10,7 +10,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.teamcode.HardwareRobot;
+
 
 
 public class AutonomousRobot extends LinearOpMode {
@@ -24,14 +26,19 @@ public class AutonomousRobot extends LinearOpMode {
 
 
     HardwareRobot robot;
-    ImuSensor imu;
+
     DogeVuforia dogevuforia;
 
 
-    AutoPosition location = AutoPosition.UNKNOWN;
+    AutoPosition location;
 
 
     ElapsedTime runTime;
+
+    //imu variables
+    BNO055IMU               imu;
+    Orientation lastAngles = new Orientation();
+    double globalAngle, power = .30, correction;
 
 
     @Override
@@ -40,16 +47,35 @@ public class AutonomousRobot extends LinearOpMode {
         location = AutoPosition.UNKNOWN;
 
         robot = new HardwareRobot(hardwareMap);
-        imu = new ImuSensor(hardwareMap);
         dogevuforia = new DogeVuforia(hardwareMap);
 
         runTime = new ElapsedTime();
 
+        robot.ResetAllEncoders();
+        robot.ResetServos();
+
+        robot.extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.extensionMotor.setTargetPosition(robot.extensionMotor.getCurrentPosition());
+
+        //imu stuffs
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+
+        parameters.mode                = BNO055IMU.SensorMode.IMU;
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled      = false;
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+
+        imu.initialize(parameters);
+
+
     }
 
     void WaitAbsolute(double seconds) {
-
-
 
         while (opModeIsActive() && runTime.seconds() <= seconds) {
 
@@ -89,13 +115,12 @@ public class AutonomousRobot extends LinearOpMode {
 
     //strafe drive for a given amount of seconds at a given speed and angle (in radians)
     // OUTDATED*******************************************************************
-    void DriveByTime(double time, double speed, double angle){
+    void DriveByTime(double time, double speed){
 
 
-        angle = Math.toRadians(angle);
 
-       robot.leftDrive.setPower(speed*(Math.cos(angle - Math.PI / 4)));
-       robot.rightDrive.setPower(speed*(Math.sin(angle - Math.PI / 4)));
+       robot.leftDrive.setPower(speed);
+       robot.rightDrive.setPower(speed);
 
 
        WaitFor(time);
@@ -120,47 +145,6 @@ public class AutonomousRobot extends LinearOpMode {
 
     }
 
-    //rotate robot on center axis to an absolute angle
-    void AbsoluteTurn(double angle, double speed, double timeout) {
-
-
-
-        robot.leftDrive.setPower(speed);
-        robot.rightDrive.setPower(-speed);
-
-
-        double timeToStop = getNewTime(timeout);
-
-        while (Math.abs(imu.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle - angle) > 5 && runTime.seconds() <= timeToStop && opModeIsActive()) {
-
-            telemetry.addData("Target Angle", angle)
-                    .addData("Distance to go", Math.abs(imu.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle - angle))
-                    .addData("Current Angle", imu.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
-            telemetry.update();
-
-            idle();
-
-        }
-
-        WaitFor(0.25);
-
-        robot.StopDriveMotors();
-
-    }
-
-    //rotate robot on center axis for an angle relative to current position
-    void RelativeTurn(double angle, double speed, double timeout) {
-
-        double turnTo = angle + imu.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-
-        if (turnTo >= 180)
-            turnTo -= 360;
-        else if (turnTo <= -180)
-            turnTo += 360;
-
-        AbsoluteTurn(turnTo, speed, timeout);
-
-    }
 
     // ENCODER METHODS----------------------------------------------------
 
@@ -196,6 +180,7 @@ public class AutonomousRobot extends LinearOpMode {
 
             // reset the timeout time and start motion.
             runtime.reset();
+
             robot.leftDrive.setPower(Math.abs(speed));
             robot.rightDrive.setPower(Math.abs(speed));
 
@@ -222,6 +207,10 @@ public class AutonomousRobot extends LinearOpMode {
             robot.rightDrive.setPower(0);
 
             // Turn off RUN_TO_POSITION
+            robot.leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
             robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -243,6 +232,7 @@ public class AutonomousRobot extends LinearOpMode {
             robot.strafeDrive.setTargetPosition(newStrafeTarget);
 
             robot.strafeDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
             runtime.reset();
             robot.strafeDrive.setPower(Math.abs(speed));
 
@@ -258,6 +248,7 @@ public class AutonomousRobot extends LinearOpMode {
             robot.strafeDrive.setPower(0);
 
             // Turn off RUN_TO_POSITION
+            robot.strafeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.strafeDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             //  sleep(250);   // optional pause after each move
@@ -267,78 +258,277 @@ public class AutonomousRobot extends LinearOpMode {
 
     }
 
+    void TimeStrafe(double speed, double time){
 
 
-
-
-    void Unlatch(){
-
-        final int MAX_POS = 500;
-
-        while(robot.liftMotor.getCurrentPosition() < MAX_POS){
-
-            robot.liftMotor.setPower(.3);
+        if (opModeIsActive()) {
+            robot.strafeDrive.setPower(speed);
+            WaitFor(time);
         }
-        robot.liftMotor.setPower(0);
-
-        //move out of latch
-
-    }
-
-    void StartDoge(){
-
-        dogevuforia.StartDoge();
-    }
-
-    //drive to in front of the rightmost sampling block
-
-    void DriveToSampling(){
-
-        RelativeTurn(90,.3,4);
-        StrafeDrive(.4,15, 4);
-        EncoderDrive(.5,-15,-15, 4);
-
-    }
-
-    //keep driving left until aligned with the gold block
-
-    void GoldAlign(){
-
-        double stopTime = getNewTime(4.25);
-
-
-        StartDoge();
-
-        while (!dogevuforia.getIsAligned() && runTime.seconds() <= stopTime) {
-
-                robot.leftDrive.setPower(.3);
-                robot.rightDrive.setPower(.3);
-
-              idle();
-        }
-
-        //stop robot if no gold cube in sight or aligned
         robot.StopDriveMotors();
 
-        dogevuforia.StopDoge();
 
     }
 
-    //drive forward to knock off gold cube, keep driving if going into crater, otherwise stop and place marker (unfinished)
-    // OUTDATED*******************************************************************
-
-    void KnockGold(){
-
-        StrafeDrive(.6,10,4);
-        StrafeDrive(.6,-10,4);
-
-
-    }
-
-
+    //initialize servo positions
     void SetServo(){
 
         robot.markerServo.setPosition(Servo.MAX_POSITION);
+        robot.webcamServo.setPosition(Servo.MAX_POSITION);
+
+
+    }
+
+    //IMU METHODS---------------------------------------------------------------------------
+
+    private void resetAngle()
+    {
+        lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        globalAngle = 0;
+    }
+
+    /**
+     * Get current cumulative angle rotation from last reset.
+     * @return Angle in degrees. + = left, - = right.
+     */
+    private double getAngle()
+    {
+        // We experimentally determined the Z axis is the axis we want to use for heading angle.
+        // We have to process the angle because the imu works in euler angles so the Z axis is
+        // returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
+        // 180 degrees. We detect this transition and track the total cumulative angle of rotation.
+
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        double deltaAngle = angles.thirdAngle - lastAngles.thirdAngle;
+
+        if (deltaAngle < -180)
+            deltaAngle += 360;
+        else if (deltaAngle > 180)
+            deltaAngle -= 360;
+
+        globalAngle += deltaAngle;
+
+        lastAngles = angles;
+
+        return globalAngle;
+    }
+
+    /**
+     * See if we are moving in a straight line and if not return a power correction value.
+     * @return Power adjustment, + is adjust left - is adjust right.
+     */
+    private double checkDirection()
+    {
+        // The gain value determines how sensitive the correction is to direction changes.
+        // You will have to experiment with your robot to get small smooth direction changes
+        // to stay on a straight line.
+        double correction, angle, gain = .10;
+
+        angle = getAngle();
+
+        if (angle == 0)
+            correction = 0;             // no adjustment.
+        else
+            correction = -angle;        // reverse sign of angle for correction.
+
+        correction = correction * gain;
+
+        return correction;
+    }
+
+    /**
+     * Rotate left or right the number of degrees. Does not support turning more than 180 degrees.
+     * @param degrees Degrees to turn, + is left - is right
+     */
+    private void rotate(int degrees, double power)
+    {
+        double  leftPower, rightPower;
+
+        // restart imu movement tracking.
+        resetAngle();
+
+        // getAngle() returns + when rotating counter clockwise (left) and - when rotating
+        // clockwise (right).
+
+        if (degrees < 0)
+        {   // turn right.
+            leftPower = -power;
+            rightPower = power;
+        }
+        else if (degrees > 0)
+        {   // turn left.
+            leftPower = power;
+            rightPower = -power;
+        }
+        else return;
+
+        // set power to rotate.
+        robot.leftDrive.setPower(leftPower);
+        robot.rightDrive.setPower(rightPower);
+
+        // rotate until turn is completed.
+        if (degrees < 0)
+        {
+            // On right turn we have to get off zero first.
+            while (opModeIsActive() && getAngle() == 0) {}
+
+            while (opModeIsActive() && getAngle() > degrees) {}
+        }
+        else    // left turn.
+            while (opModeIsActive() && getAngle() < degrees) {}
+
+        // turn the motors off.
+        robot.leftDrive.setPower(0);
+        robot.rightDrive.setPower(0);
+
+        // wait for rotation to stop.
+        sleep(1000);
+
+        // reset angle tracking on new heading.
+        resetAngle();
+    }
+
+    //180 to -180 going left to right
+    void AbsoluteTurn(double speed, double targetAngle){
+
+        double currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+
+
+        if (currentAngle < targetAngle){
+
+            while (opModeIsActive() && imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle < targetAngle) {
+
+                robot.leftDrive.setPower(-speed);
+                robot.rightDrive.setPower(speed);
+            }
+
+
+        }else if (currentAngle > targetAngle){
+
+            while (opModeIsActive() && imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle > targetAngle) {
+
+                robot.leftDrive.setPower(speed);
+                robot.rightDrive.setPower(-speed);
+            }
+        }
+
+        robot.leftDrive.setPower(0);
+        robot.rightDrive.setPower(0);
+
+    }
+
+    //PATHING METHODS
+   // --------------------------------------------------------------
+
+    void Unlatch(){
+
+        final int UNLATCH_POS = -4076;
+
+
+
+        while (opModeIsActive() && robot.liftMotor.getCurrentPosition() > UNLATCH_POS) {
+
+            robot.liftMotor.setPower(-1);
+
+
+
+    }
+
+        robot.liftMotor.setPower(0);
+
+
+        EncoderDrive(.1, -1, -1, 2);
+
+
+    }
+
+
+
+    //drive out of hook
+    void DriveToSampling(){
+
+
+        StrafeDrive(.5,-9,5);
+
+        EncoderDrive(.5,5,5,5);
+
+        StrafeDrive(.5,9,5);
+
+
+        AbsoluteTurn(.2, 50);
+        AbsoluteTurn(.1, 55);
+
+        EncoderDrive(.4, 22, 22, 5);
+
+        AbsoluteTurn(.2, -90);
+        AbsoluteTurn(.1, -90);
+
+
+        /**
+        AbsoluteTurn(.1,0);
+        AbsoluteTurn(.1,0);
+
+
+        EncoderDrive(.6,14,14,5);
+
+        AbsoluteTurn(.2, -90);
+        AbsoluteTurn(.1, -90);
+
+
+        sleep(250);
+
+        //drive to leftmost
+        EncoderDrive(.7, -30, -30, 4);
+        sleep(250);
+*/
+
+    }
+
+
+    //turn all the way left, then keep turning right until aligned with gold block
+
+    void GoldAlign(){
+
+
+        //actual alignment
+        dogevuforia.StartDoge();
+
+        double stopTime = getNewTime(4);
+
+        while (!dogevuforia.getIsAligned() && runTime.seconds() <= stopTime){
+
+            robot.leftDrive.setPower(.2);
+            robot.rightDrive.setPower(.2);
+
+        }
+        robot.leftDrive.setPower(0);
+        robot.rightDrive.setPower(0);
+        sleep(250);
+
+
+    }
+
+    void KnockGold(){
+
+/*
+        AbsoluteTurn(.1, 0);
+        AbsoluteTurn(.1, 0);
+
+        EncoderDrive(.6, 10, 10, 4);
+        EncoderDrive(.6, -10, -10, 4);
+
+        AbsoluteTurn(.2, -90);
+        AbsoluteTurn(.1, -90);
+        //AbsoluteTurn(.3,-50);
+        //AbsoluteTurn(.1, -90);
+*/
+
+        TimeStrafe(-.7, .5);
+        TimeStrafe(.7, .5);
+
+
 
     }
 

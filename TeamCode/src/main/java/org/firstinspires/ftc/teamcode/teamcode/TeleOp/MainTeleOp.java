@@ -6,6 +6,9 @@ import org.firstinspires.ftc.teamcode.teamcode.HardwareRobot;
 import org.firstinspires.ftc.teamcode.teamcode.Testers.MecanumTest;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import java.lang.Math;
 
 @TeleOp(name="Main TeleOop", group="Linear Opmode")
@@ -18,28 +21,14 @@ public class MainTeleOp extends OpMode {
 
     }
 
-    //unused, here if we want to set certain encoder positions for the lift and arm
-    private enum LiftPosition{
-    }
-
-    private enum ArmRotationPosition{
-
-        LOWERED, RAISED, TO_LOWERED, TO_RAISED, STATIC, MANUAL
-
-    }
-
-    //fields to control the postiion of the grabber, also unused
-
-
-    private ArmRotationPosition armRotationPosition;
-    private int manualPosition;
-
-
 
     //fields to control speed of drive train
     private DriveSpeed driveSpeed;
     private double speedMod;
+    private ElapsedTime runTime;
 
+    private boolean locked;
+    private int target;
 
     //declare the robot!
     HardwareRobot robot;
@@ -54,12 +43,14 @@ public class MainTeleOp extends OpMode {
         //set the drive speed to default
         driveSpeed = DriveSpeed.FAST;
         speedMod = 1;
+        locked = false;
+        target = 0;
 
-        //robot.rotationMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        //robot.rotationMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        runTime = new ElapsedTime();
+        //robot.ResetAllEncoders(); uwu
 
-        //armRotationPosition = ArmRotationPosition.LOWERED;
-        //manualPosition = 0;
+
+
     }
 
     @Override
@@ -69,26 +60,24 @@ public class MainTeleOp extends OpMode {
 
         LiftControl();
 
-        //ArmRotationControl();
+        ScoopControl();
 
-        //ArmExtensionControl();
+        ExtensionControl();
 
-        //GrabControl();
+        //TiltControl();
+
+        GrabControl();
 
         telemetry.addData("Speed:  ", speedMod);
         telemetry.addData("Lift Position", robot.liftMotor.getCurrentPosition());
-        //telemetry.addData("Extension Position", robot.extensionMotor.getCurrentPosition());
-        //telemetry.addData("Rotation Position", robot.rotationMotor.getCurrentPosition());
-        //telemetry.addData("Rotation Position name  ", armRotationPosition);
-        //telemetry.addData("target position: ", robot.rotationMotor.getTargetPosition());
-        telemetry.update();
+        telemetry.addData("Extension Position", robot.extensionMotor.getCurrentPosition());
+        telemetry.addData("Target Pos", robot.extensionMotor.getTargetPosition());
 
+        telemetry.update();
 
     }
 
-
-
-    //sets power to motors from joystick input based on mecanum setup
+    //omni wheel setup with strafe
     public void DriveControl(){
 
         //sets the speedMod by checking for speed adjustments via d-pad
@@ -106,17 +95,13 @@ public class MainTeleOp extends OpMode {
     //Check first controller d-pad for speed modifier
     public void CheckSpeed(){
 
-        if (gamepad1.dpad_down) {
+        if (gamepad1.x) {
 
             driveSpeed = DriveSpeed.SLOW;
 
-        } else if (gamepad1.dpad_up ) {
+        } else if (gamepad1.y) {
 
             driveSpeed = DriveSpeed.FAST;
-
-        }else if (gamepad1.dpad_left ){
-
-            driveSpeed = DriveSpeed.SLOWEST;
 
         }
 
@@ -129,31 +114,23 @@ public class MainTeleOp extends OpMode {
             case FAST: speedMod = 1;
                         break;
 
-            case SLOWEST: speedMod = .25;
-
-                        break;
         }
 
 
     }
 
-
-
-
     //Second controller joysticks (left for linear, right for rotation)
     public void LiftControl() {
 
-        final int MAX_POSITION = 3750;
-        final int MIN_POSITION = 0;
+        if (gamepad1.dpad_down){
 
-        if (gamepad2.dpad_down ){
-
-            robot.liftMotor.setPower(-.4);
+            robot.liftMotor.setPower(.7);
 
 
-        }else if (gamepad2.dpad_up){
+        }else if (gamepad1.dpad_up){
 
-            robot.liftMotor.setPower(.4);
+            robot.liftMotor.setPower(-.7);
+
         }else{
 
             robot.liftMotor.setPower(0);
@@ -161,164 +138,234 @@ public class MainTeleOp extends OpMode {
 
     }
 
-    public void CheckArmRotationControl() {
+    public void ScoopControl() {
+
+        if (gamepad2.a) {
 
 
-        if (gamepad2.b) {
+            robot.scoopServo.setPosition(Servo.MIN_POSITION);
+            robot.swingServo1.setPosition(.1);
+            robot.swingServo2.setPosition(.9);
 
-            armRotationPosition = ArmRotationPosition.TO_LOWERED;
+            double waitTime = runTime.seconds() + 1.1;
+            while (getRuntime() < waitTime) {
 
-        } else if (gamepad2.y) {
+                //delay
+            }
 
-            armRotationPosition = ArmRotationPosition.TO_RAISED;
-
-        //} else if (gamepad2.x) {
-
-           // armRotationPosition = ArmRotationPosition.TO_SUCKER;
-
-        }else if (gamepad2.right_stick_y != 0){
-
-            armRotationPosition = ArmRotationPosition.MANUAL;
+            robot.scoopServo.setPosition(.5);
+            telemetry.addData("arm pos: ", "Lowered");
 
         }
 
-        if(!gamepad2.b && armRotationPosition == ArmRotationPosition.TO_LOWERED){
+        if (gamepad2.y){
 
-            armRotationPosition = ArmRotationPosition.LOWERED;
+            double waitTime;
 
-        }else if(!gamepad2.y && armRotationPosition == ArmRotationPosition.TO_RAISED){
+            robot.scoopServo.setPosition(Servo.MIN_POSITION);
 
-            armRotationPosition = ArmRotationPosition.RAISED;
+            waitTime = runTime.seconds() + .5;
 
-       // }else if(!gamepad2.x && armRotationPosition == ArmRotationPosition.TO_SUCKER){
+            while (getRuntime() < waitTime) {
 
-           // armRotationPosition = ArmRotationPosition.SUCKER;
+                //delay
+            }
+
+            robot.swingServo1.setPosition(.7);
+            robot.swingServo2.setPosition(.3);
+
+            //extend outwards for momentum
+
+            waitTime = runTime.seconds() + .05;
+            while (getRuntime() < waitTime) {
+
+                //delay
+            }
+
+            robot.scoopServo.setPosition(Servo.MAX_POSITION);
+
+            waitTime = runTime.seconds() + .5;
+            while (getRuntime() < waitTime) {
+
+                //delay
+            }
+
+
+            robot.swingServo1.setPosition(Servo.MAX_POSITION);
+            robot.swingServo2.setPosition(Servo.MIN_POSITION);
+
+            waitTime = runTime.seconds() + .1;
+            while (getRuntime() < waitTime) {
+
+             //delay
+            }
+
+            robot.scoopServo.setPosition(.5);
+
+            telemetry.addData("arm pos: ", "Near");
+
         }
 
+        if (gamepad2.x){
+
+            double waitTime;
+
+            robot.scoopServo.setPosition(Servo.MIN_POSITION);
+
+            waitTime = runTime.seconds() + .5;
+
+            while (getRuntime() < waitTime) {
+
+                //delay
+            }
+
+            robot.swingServo1.setPosition(.7);
+            robot.swingServo2.setPosition(.3);
+
+            //extend outwards for momentum
+
+            waitTime = runTime.seconds() + .05;
+            while (getRuntime() < waitTime) {
+
+                //delay
+            }
+
+            robot.scoopServo.setPosition(Servo.MAX_POSITION);
+
+            waitTime = runTime.seconds() + .5;
+            while (getRuntime() < waitTime) {
+
+                //delay
+            }
+
+
+            robot.swingServo1.setPosition(.8);
+            robot.swingServo2.setPosition(.2);
+
+            waitTime = runTime.seconds() + .1;
+            while (getRuntime() < waitTime) {
+
+                //delay
+            }
+
+            robot.scoopServo.setPosition(Servo.MAX_POSITION);
+
+            waitTime = runTime.seconds() + .2;
+            while (getRuntime() < waitTime) {
+
+                //delay
+            }
+
+            robot.scoopServo.setPosition(.5);
+
+            robot.swingServo1.setPosition(Servo.MAX_POSITION);
+            robot.swingServo2.setPosition(Servo.MIN_POSITION);
+
+            telemetry.addData("arm pos: ", "Far");
+
+
+        }
     }
 
+    //to be done
+    public void ExtensionControl(){
 
-    public void ArmRotationControl(){
-
-        final int SUCKER_POSITION = 390;
-        final int MAX_POSITION = 130;
-        final int MIN_POSITION = 20;
-        final double power = .8;
-
-
-        CheckArmRotationControl();
-
-        switch(armRotationPosition){
-
-            case LOWERED:
-
-                if (robot.rotationMotor.getCurrentPosition() > 20) {
-                    robot.rotationMotor.setTargetPosition(MIN_POSITION);
-                    robot.rotationMotor.setPower(power);
-
-                }else{
-
-                    armRotationPosition = ArmRotationPosition.STATIC;
-                }
-                manualPosition = MIN_POSITION;
-
-               break;
-
-            case RAISED:
-
-
-                    robot.rotationMotor.setTargetPosition(MAX_POSITION);
-                    robot.rotationMotor.setPower(power);
-                    manualPosition = MAX_POSITION;
-                    
-                break;
-
-           // case SUCKER:
-
-                //if(robot.rotationMotor.getCurrentPosition() < SUCKER_POSITION) {
-              //      robot.rotationMotor.setTargetPosition(SUCKER_POSITION);
-              //      robot.rotationMotor.setPower(power);
-              //      manualPosition = SUCKER_POSITION;
-                //}else{
-
-                  //  armRotationPosition = ArmRotationPosition.STATIC;
-                //}
-              //  break;
-
-            case STATIC:
-                robot.rotationMotor.setPower(0);
-                break;
-
-            case MANUAL:
-
-                if (gamepad2.dpad_up || gamepad2.dpad_down){
-
-                    if(gamepad2.dpad_down) {
-                        manualPosition +=2;
-                        robot.rotationMotor.setTargetPosition(manualPosition);
-                        robot.rotationMotor.setPower(power);
-                    }else {
-                        manualPosition-=2;
-                        robot.rotationMotor.setTargetPosition(manualPosition);
-                        robot.rotationMotor.setPower(power);
-
-                    }
-                }else{
-
-                    robot.rotationMotor.setTargetPosition(manualPosition);
-                    robot.rotationMotor.setPower(power);
-                }
-                break;
-
-        }
-
-    }
-
-    public void ArmExtensionControl(){
-
-        final int MAX_POSITION = 1100;
+        final int MAX_POSITION = 230;
         final int MIN_POSITION = -100;
-        final double power = .6;
+        final double power = .5;
+
+
+        robot.extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         if (gamepad2.left_stick_y < 0 ) {
 
+            //robot.extensionMotor.setTargetPosition(robot.extensionMotor.getCurrentPosition() + (int)(gamepad2.left_stick_y * 15));
+            robot.extensionMotor.setPower( gamepad2.left_stick_y *power);
 
-            robot.extensionMotor.setTargetPosition(MAX_POSITION);
-            robot.extensionMotor.setPower(-gamepad2.left_stick_y * power);
+        }else if (gamepad2.left_stick_y > 0){
 
-        }else if(gamepad2.left_stick_y > 0 ) {
+            //robot.extensionMotor.setTargetPosition(robot.extensionMotor.getCurrentPosition() + (int)(gamepad2.left_stick_y * 15));
+            robot.extensionMotor.setPower(gamepad2.left_stick_y *power);
 
-
-            robot.extensionMotor.setTargetPosition(MIN_POSITION);
-            robot.extensionMotor.setPower(-gamepad2.left_stick_y * power);
-
-        }else{
+        }else if (gamepad2.left_stick_y == 0 && !gamepad2.right_bumper){
 
             robot.extensionMotor.setPower(0);
         }
 
+        if(!locked && gamepad2.right_bumper)
+            target = robot.extensionMotor.getCurrentPosition();
 
+        if (gamepad2.right_bumper){
+
+            locked = true;
+
+            robot.extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.extensionMotor.setTargetPosition(target);
+            robot.extensionMotor.setPower(1);
+
+        }else{
+
+            locked = false;
+        }
 
 
     }
+
+/*
+    private void TiltControl(){
+
+        final double power = .5;
+
+        if (gamepad2.dpad_up){
+
+            robot.rotationMotor.setPower(power);
+
+        }else if (gamepad2.dpad_down){
+
+            robot.rotationMotor.setPower(-power);
+
+        }else{
+
+            robot.rotationMotor.setPower(0);
+        }
+
+
+    }
+*/
 
     //left and right triggers for intake/outtake, else stop collection motor
     private void GrabControl(){
 
         if (gamepad2.left_trigger != 0){
-            robot.collectionMotor.setPower(-gamepad2.left_trigger * .7);
+            robot.collectionMotor.setPower(gamepad2.left_trigger * .7);
 
         }
         if(gamepad2.right_trigger != 0){
 
-            robot.collectionMotor.setPower(gamepad2.right_trigger * .7);
+            robot.collectionMotor.setPower(-gamepad2.right_trigger * .7);
 
         }
-        if (gamepad2.left_trigger == 0 && gamepad2.right_trigger == 0){
+
+        if (gamepad2.left_bumper){
+
+
+            robot.collectionMotor.setPower(.3);
+
+        }
+
+        if (gamepad2.right_bumper){
+
+            robot.collectionMotor.setPower(-.3);
+
+        }
+
+        if (gamepad2.left_trigger == 0 && gamepad2.right_trigger == 0 && !gamepad2.left_bumper && !gamepad2.right_bumper){
 
             robot.collectionMotor.setPower(0);
 
         }
+
+
 
     }
 
