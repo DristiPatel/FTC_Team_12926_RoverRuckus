@@ -6,24 +6,33 @@ import com.disnodeteam.dogecv.DogeCV;
 import com.disnodeteam.dogecv.detectors.roverrukus.GoldAlignDetector;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.teamcode.Autonomous.AutonomousRobot;
 
-@Autonomous(name = "doge test", group = "Autonomous")
-
 @Disabled
-public class DetectorTest extends AutonomousRobot {
+@TeleOp(name = "doge test", group = "TeleOp")
+
+
+public class DetectorTest extends LinearOpMode {
+
+    WebcamName webcamName;
 
     private GoldAlignDetector detector;
 
     @Override
     public void runOpMode(){
-        super.runOpMode();
+
+        webcamName = hardwareMap.get(WebcamName.class, "Webcam");
+
 
         //Initialize and set the settings for the detector
         detector = new GoldAlignDetector(); // Create detector
         detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance()); // Initialize it with the app context and camera
         detector.useDefaults(); // Set detector to use default settings
+
 
         // Optional tuning
         detector.alignSize = 100; // How wide (in pixels) is the range in which the gold object will be aligned. (Represented by green bars in the preview)
@@ -43,17 +52,17 @@ public class DetectorTest extends AutonomousRobot {
         waitForStart();
 
 
+        while (opModeIsActive()) {
 
+            telemetry.addData("Is Aligned?: ", detector.getAligned()); // Is the bot aligned with the gold mineral?
+            telemetry.addData("X Pos: ", detector.getXPosition()); // Gold X position.
+            telemetry.addData("Y Pos: ", detector.getScreenPosition().y);// Gold Y pos
 
-
-
-
+            telemetry.update();
+        }
 
 
     }
-
-
-
 
 
 

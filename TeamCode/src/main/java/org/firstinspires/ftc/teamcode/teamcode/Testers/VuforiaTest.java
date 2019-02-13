@@ -67,7 +67,6 @@ public class VuforiaTest extends OpMode {
 
     }
 
-    private DcMotor leftDrive, rightDrive, strafeDrive;
 
 
     private DriveSpeed driveSpeed;
@@ -107,19 +106,11 @@ public class VuforiaTest extends OpMode {
         //initialize webcam
         webcamName = hardwareMap.get(WebcamName.class, "Webcam");
 
-        leftDrive = hardwareMap.get(DcMotor.class, "Left Drive");
-        rightDrive = hardwareMap.get(DcMotor.class, "Right Drive");
-        strafeDrive = hardwareMap.get(DcMotor.class, "Strafe Drive");
-
-
-        //reverse a side of motors
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
-
-
+        /*
         driveSpeed = DriveSpeed.FAST;
         speedMod = 1;
 
-
+*/
 
         // Setup camera and Vuforia parameters
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -198,6 +189,9 @@ public class VuforiaTest extends OpMode {
         detector.areaScoringMethod = DogeCV.AreaScoringMethod.MAX_AREA; // Can also be PERFECT_AREA
         //detector.perfectAreaScorer.perfectArea = 10000; // Uncomment if using PERFECT_AREA scoring
 
+        //change alignment settings
+        detector.setAlignSettings(0, 100);
+
         //Setup Vuforia
         vuforia.setDogeCVDetector(detector); // Set the Vuforia detector
         vuforia.enableDogeCV(); //Enable the DogeCV-Vuforia combo
@@ -244,12 +238,7 @@ public class VuforiaTest extends OpMode {
     @Override
     public void loop() {
 
-        CheckSpeed();
-
-        leftDrive.setPower(speedMod*(-gamepad1.left_stick_y + gamepad1.right_stick_x));
-        rightDrive.setPower(speedMod*(-gamepad1.left_stick_y - gamepad1.right_stick_x));
-
-        strafeDrive.setPower(speedMod*(gamepad1.left_stick_x));
+        //CheckSpeed();
 
 
         //Assume we can't find a target
@@ -271,10 +260,12 @@ public class VuforiaTest extends OpMode {
             }
         }
 
+        //TRACKABLES OUTPUT-------------------------
         // Provide feedback as to where the robot is located (if we know).
         if (targetVisible) {
             // Express position (translation) of robot in inches.
             VectorF translation = lastLocation.getTranslation();
+            telemetry.addLine("Vuforia stuff--------------------------");
             telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
                     translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
 
@@ -287,11 +278,19 @@ public class VuforiaTest extends OpMode {
             telemetry.addData("Visible Target", "none");
         }
 
-
+        //IMU OUTPUT------------------------------------
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        telemetry.addLine("IMU stuffs----------------------");
         telemetry.addData("Z", angles.firstAngle);
         telemetry.addData("Y", angles.secondAngle);
         telemetry.addData("X", angles.thirdAngle);
+
+        //GOLD DETECTOR OUTPUT----------------------------
+
+        telemetry.addLine("Gold Detector stuffs0-----------");
+        telemetry.addData("is Aligned: ", detector.getAligned());
+        telemetry.addData("X pos: ", detector.getXPosition());
+        telemetry.addData("Y pos: ", detector.getScreenPosition().y);
 
         // Update telemetry
         telemetry.update();
@@ -303,6 +302,7 @@ public class VuforiaTest extends OpMode {
     @Override
     public void stop() {
         vuforia.stop();
+
 
     }
 

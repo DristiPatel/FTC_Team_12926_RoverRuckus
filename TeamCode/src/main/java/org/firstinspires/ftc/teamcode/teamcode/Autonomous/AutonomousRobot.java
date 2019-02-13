@@ -23,8 +23,6 @@ public class AutonomousRobot extends LinearOpMode {
         CRATER, DEPOT , UNKNOWN
     }
 
-
-
     HardwareRobot robot;
 
     DogeVuforia dogevuforia;
@@ -75,6 +73,10 @@ public class AutonomousRobot extends LinearOpMode {
 
     }
 
+    /**
+     * Idle method to wait until a set time
+     * @param seconds the absolute runtime in seconds to wait
+     */
     void WaitAbsolute(double seconds) {
 
         while (opModeIsActive() && runTime.seconds() <= seconds) {
@@ -97,10 +99,13 @@ public class AutonomousRobot extends LinearOpMode {
         if(!opModeIsActive())
             stop();
 
-
-
     }
 
+    /**
+     * Gets a new runtime added to the current runtime
+     * @param addedSeconds
+     * @return
+     */
     double getNewTime(double addedSeconds) {
 
         return runTime.seconds() + addedSeconds;
@@ -113,10 +118,12 @@ public class AutonomousRobot extends LinearOpMode {
     }
 
 
-    //strafe drive for a given amount of seconds at a given speed and angle (in radians)
-    // OUTDATED*******************************************************************
+    /**
+     * Drive forwards/backwards for a set amount of time
+     * @param time in seconds to drive
+     * @param speed from -1 to 1, negative being backwards and positive being forwards
+     */
     void DriveByTime(double time, double speed){
-
 
 
        robot.leftDrive.setPower(speed);
@@ -130,8 +137,11 @@ public class AutonomousRobot extends LinearOpMode {
 
     }
 
-    //rotate for a certain amount of time
-    //speed from [-1 to 1]; negative is left and positive is right
+    /**
+     * rotates the robot for a set amount of time
+     * @param time in seconds to turn for
+     * @param speed power to motor from -1 to 1, negative being left and positive being right
+     */
     void TurnByTime(double time, double speed){
 
 
@@ -158,6 +168,13 @@ public class AutonomousRobot extends LinearOpMode {
     static final double     TURN_SPEED              = 1;
 
 
+    /**
+     * Drive forward/backwards for a set distance using encoders
+     * @param speed power to motors -1 to 1
+     * @param leftInches distance for left side of drivetrain to travel
+     * @param rightInches distance for right side of drivetrain to travel
+     * @param timeout time in seconds for motors to stop regardless whether distance was reached
+     */
     void EncoderDrive(double speed, double leftInches, double rightInches, double timeout){
 
         ElapsedTime runtime = new ElapsedTime();
@@ -220,6 +237,14 @@ public class AutonomousRobot extends LinearOpMode {
 
     }
 
+    /**
+     * Uses encoders to strafe horizontally for a set distance.
+     * This method does not work as intended because the drive train cannot support horizontal strafing in a straight line
+     * @param speed power to motors -1 to 1
+     * @param inches distance to travel
+     * @param timeout when to stop the motors in seconds regardless if distance was reached
+     */
+
     void StrafeDrive(double speed, double inches, double timeout){
 
         ElapsedTime runtime = new ElapsedTime();
@@ -257,6 +282,13 @@ public class AutonomousRobot extends LinearOpMode {
         }
 
     }
+
+    /**
+     * Strafe horizontally on the strafe wheel for a set time
+     * NOTE: robot does not strafe in a straight line due to weight on drive train
+     * @param speed power to motor -1 to 1
+     * @param time in seconds
+     */
 
     void TimeStrafe(double speed, double time){
 
@@ -424,23 +456,17 @@ public class AutonomousRobot extends LinearOpMode {
 
     void Unlatch(){
 
-        final int UNLATCH_POS = -4076;
-
-
+        final int UNLATCH_POS = 17000;
 
         while (opModeIsActive() && robot.liftMotor.getCurrentPosition() > UNLATCH_POS) {
 
-            robot.liftMotor.setPower(-1);
-
-
+            robot.liftMotor.setPower(1);
 
     }
 
         robot.liftMotor.setPower(0);
 
-
-        EncoderDrive(.1, -1, -1, 2);
-
+        DriveByTime(.2, -.4);
 
     }
 
@@ -465,24 +491,6 @@ public class AutonomousRobot extends LinearOpMode {
         AbsoluteTurn(.2, -90);
         AbsoluteTurn(.1, -90);
 
-
-        /**
-        AbsoluteTurn(.1,0);
-        AbsoluteTurn(.1,0);
-
-
-        EncoderDrive(.6,14,14,5);
-
-        AbsoluteTurn(.2, -90);
-        AbsoluteTurn(.1, -90);
-
-
-        sleep(250);
-
-        //drive to leftmost
-        EncoderDrive(.7, -30, -30, 4);
-        sleep(250);
-*/
 
     }
 
@@ -512,18 +520,6 @@ public class AutonomousRobot extends LinearOpMode {
 
     void KnockGold(){
 
-/*
-        AbsoluteTurn(.1, 0);
-        AbsoluteTurn(.1, 0);
-
-        EncoderDrive(.6, 10, 10, 4);
-        EncoderDrive(.6, -10, -10, 4);
-
-        AbsoluteTurn(.2, -90);
-        AbsoluteTurn(.1, -90);
-        //AbsoluteTurn(.3,-50);
-        //AbsoluteTurn(.1, -90);
-*/
 
         TimeStrafe(-.7, .5);
         TimeStrafe(.7, .5);

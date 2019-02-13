@@ -18,6 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.teamcode.HardwareRobot;
+import org.opencv.core.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -167,9 +168,21 @@ public class DogeVuforia extends AutonomousRobot{
 
     }
 
+    public Point getPosition(){
+
+        return detector.getScreenPosition();
+    }
+
+    public void setAlignmentSettings(int offset, int width){
+
+        detector.setAlignSettings(offset, width);
+    }
+
     public void StopDoge(){
 
         detector.disable();
+        vuforia.stop();
+
 
     }
 
@@ -224,7 +237,6 @@ public class DogeVuforia extends AutonomousRobot{
     }
 
     public boolean isTargetVisible(){
-
 
         TrackTargets();
         return targetVisible;

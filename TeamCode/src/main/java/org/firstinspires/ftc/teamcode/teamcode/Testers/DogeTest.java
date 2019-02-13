@@ -38,8 +38,6 @@ public class DogeTest extends LinearOpMode {
         backRight.setDirection(DcMotor.Direction.REVERSE);
 
 
-
-
         //Initialize and set the settings for the detector
         detector = new GoldAlignDetector(); // Create detector
         detector.init(hardwareMap.appContext, CameraViewDisplay.getInstance()); // Initialize it with the app context and camera
