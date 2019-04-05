@@ -1,18 +1,14 @@
 package org.firstinspires.ftc.teamcode.teamcode.Autonomous;
 
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+@Autonomous(name = "Depot Side Autonomous WITHOUT MARKER", group = "Autonomous")
 
-@Autonomous(name = "Depot Side Autonomous", group = "Autonomous")
 @Disabled
-public class AutoBotDepot extends BetterAutonomousRobot{
+public class AutoBotDepot2 extends BetterAutonomousRobot{
 
 
     ElapsedTime runTime = new ElapsedTime();
@@ -45,21 +41,21 @@ public class AutoBotDepot extends BetterAutonomousRobot{
         Sampling();
 
         //turn towards wall and drive----------------------------------------------
-        AbsoluteTurn(.7, baseAngle+50);
+        AbsoluteTurn(.7, baseAngle+53);
 
-        EncoderDrive(1, 45, 45, 4);
+        EncoderDrive(1, 47, 47, 4);
 
         //turn toward depot and drive----------------------
         AbsoluteTurn(1, baseAngle+120);
 
-        EncoderDrive(1, -40, -40, 4);
+       // EncoderDrive(1, -40, -40, 4);
 
         //deposit marker------------------------------------------------------------
-        Marker();
+        //Marker();
 
         //turn and drive to crater--------------------------------------------------
         //rotate(-5, 1);
-        EncoderDrive(1, 50, 50, 4);
+        EncoderDrive(1, 10, 10, 4);
 
         //extend succ-----------------------------------------------------------------
         robot.extensionMotor.setPower(1);

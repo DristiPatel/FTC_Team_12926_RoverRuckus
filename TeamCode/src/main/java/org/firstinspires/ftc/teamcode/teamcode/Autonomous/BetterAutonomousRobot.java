@@ -57,9 +57,42 @@ public class BetterAutonomousRobot extends LinearOpMode {
         robot.ResetAllEncoders();
         //robot.ResetServos();
 
+        //IMU STUFF
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+
+        parameters.mode                = BNO055IMU.SensorMode.IMU;
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled      = false;
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
+        //wait for gyro to calibrate
+
+        while (!imu.isGyroCalibrated()) {
+
+            telemetry.addLine("Calibrating...");
+            telemetry.addData("heading: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
+            telemetry.update();
+        }
+
+         //READY
+
+        telemetry.addLine("Gyro ready");
+        telemetry.addData("heading: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
+        telemetry.update();
+
         baseAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
 
+        robot.markerServo.setPosition(Servo.MIN_POSITION);
+        robot.webcamServo.setPosition(Servo.MAX_POSITION);
 
+        robot.liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     //TIME METHODS-------------------------------------------------------------------------------
@@ -110,6 +143,19 @@ public class BetterAutonomousRobot extends LinearOpMode {
 
     }
 
+    public void StrafeTime(double power, double time){
+
+        if(opModeIsActive()) {
+            robot.backLeft.setPower(power);
+            robot.backRight.setPower(-power);
+            robot.frontLeft.setPower(power);
+            robot.frontRight.setPower(-power);
+
+        }
+        WaitFor(time);
+        robot.StopDriveMotors();
+    }
+
     public void TurnByTime(double time, double speed) {
 
         if (opModeIsActive()) {
@@ -143,14 +189,19 @@ public class BetterAutonomousRobot extends LinearOpMode {
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            newLeftTarget = robot.frontLeft.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
-            newRightTarget = robot.frontRight.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
+            newLeftTarget = robot.frontLeft.getCurrentPosition() + (int) ((leftInches * COUNTS_PER_INCH)/8);
+            newRightTarget = robot.frontRight.getCurrentPosition() + (int) ((rightInches * COUNTS_PER_INCH)/8);
             robot.frontLeft.setTargetPosition(newLeftTarget);
+            robot.backLeft.setTargetPosition(newLeftTarget);
             robot.frontRight.setTargetPosition(newRightTarget);
+            robot.backRight.setTargetPosition(newRightTarget);
 
             // Turn On RUN_TO_POSITION
             robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
             // reset the timeout time and start motion.
             runtime.reset();
@@ -184,10 +235,14 @@ public class BetterAutonomousRobot extends LinearOpMode {
             // Turn off RUN_TO_POSITION
             robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
             robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             //  sleep(250);   // optional pause after each move
         }
@@ -283,6 +338,7 @@ public class BetterAutonomousRobot extends LinearOpMode {
         else return;
 
         // set power to rotate.
+
         robot.backLeft.setPower(leftPower);
         robot.frontLeft.setPower(leftPower);
         robot.backRight.setPower(rightPower);
@@ -313,7 +369,7 @@ public class BetterAutonomousRobot extends LinearOpMode {
         robot.StopDriveMotors();
 
         // wait for rotation to stop.
-        sleep(1000);
+        //sleep(1000);
 
         // reset angle tracking on new heading.
         resetAngle();
@@ -355,17 +411,56 @@ public class BetterAutonomousRobot extends LinearOpMode {
     public void Unlatch(){
 
         //change
-        final int UNLATCH_POS = 17000;
+        final int UNLATCH_POS = 9035;
+
+        robot.liftMotor.setPower(1);
+
+        //unleash the webcam
+        robot.webcamServo.setPosition(0);
 
         while (opModeIsActive() && robot.liftMotor.getCurrentPosition() < UNLATCH_POS) {
 
-            robot.liftMotor.setPower(1);
+            telemetry.addData("Speed", robot.liftMotor.getPower());
+            idle();
 
         }
 
         robot.liftMotor.setPower(0);
 
-        TimeDrive(270, .2, .3);
+        //TimeDrive(90, .25, .5);
+    }
+
+    public void Succ(){
+
+        //lower succ
+        while (robot.flipMotor.getCurrentPosition() < 150) {
+            robot.flipMotor.setPower(.4);
+        }
+        robot.flipMotor.setPower(0);
+
+        while (robot.extensionMotor.getCurrentPosition() < 900){
+
+            robot.extensionMotor.setPower(1);
+        }
+        robot.extensionMotor.setPower(0);
+
+
+        robot.intakeServo.setPower(1);
+
+        WaitFor(2);
+
+        robot.intakeServo.setPower(0);
+
+        while (robot.extensionMotor.getCurrentPosition() > 20){
+
+            robot.extensionMotor.setPower(-1);
+        }
+        robot.extensionMotor.setPower(0);
+
+        while (robot.flipMotor.getCurrentPosition() > 20){
+
+            robot.flipMotor.setPower(-.3);
+        }
 
     }
 
@@ -375,7 +470,6 @@ public class BetterAutonomousRobot extends LinearOpMode {
         WaitFor(.5);
 
         GoldPosition goldPos = GoldPosition.RIGHT;
-
 
         //select gold position
 
@@ -392,28 +486,48 @@ public class BetterAutonomousRobot extends LinearOpMode {
             goldPos = GoldPosition.RIGHT;
         }
 
-
-
+        /*
+        while (runTime.seconds() < getNewTime(1)) {
+            telemetry.addData("Gold pos:", goldPos);
+            telemetry.update();
+        }
+        */
         switch(goldPos){
 
             case LEFT:
-                rotate(37, .5);
-                TimeDrive(90, 1.35,.8);
-                TimeDrive(270, 1.35, .8);
-                rotate(-37, .5);
+                rotate(30, 1);
+                //Succ();
+                EncoderDrive(1,27, 27, 3);
+                EncoderDrive(1,-27, -27, 3);
+
+                //AbsoluteTurn(.5, baseAngle);
                 break;
 
             case MID:
-                TimeDrive(90, 1.2,.8);
-                TimeDrive(270, 1.2, .8);
+                //WaitFor(2);
+                //Succ();
+                EncoderDrive(1,25, 25, 3);
+                EncoderDrive(1,-25, -25, 3);
                 break;
 
             case RIGHT:
-                rotate(-37, .5);
-                TimeDrive(90, 1.35,.8);
-                TimeDrive(270, 1.35, .8);
-                rotate(37, .5);
+                rotate(-30, 1);
+                //Succ();
+                EncoderDrive(1,27, 27, 3);
+                EncoderDrive(1,-27, -27, 3);
+                //AbsoluteTurn(.5, baseAngle);
         }
+
+    }
+
+    public void Marker(){
+
+        robot.markerServo.setPosition(Servo.MAX_POSITION);
+
+        WaitFor(1);
+
+        robot.markerServo.setPosition(Servo.MIN_POSITION);
+
 
     }
 

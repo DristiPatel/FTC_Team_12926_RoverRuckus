@@ -28,7 +28,7 @@ public class BetterHardwareRobot {
 
     public CRServo intakeServo;//continuous servo for intake
 
-    public Servo scoopServo;// flips container over
+    public Servo scoopServo, markerServo, webcamServo;// flips container over
 
     //Constructors
     /**
@@ -65,6 +65,8 @@ public class BetterHardwareRobot {
         //SERVOS
         intakeServo = hwmp.crservo.get("Intake Servo");
         scoopServo = hwmp.servo.get("Scoop Servo");
+        markerServo = hwmp.servo.get("Marker Servo");
+        webcamServo = hwmp.servo.get("Webcam Servo");
 
 
 
@@ -78,14 +80,15 @@ public class BetterHardwareRobot {
         ResetDriveEncoders();
 
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        //extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
+        extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        flipMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        scoopMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+        extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flipMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        scoopMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     /**
