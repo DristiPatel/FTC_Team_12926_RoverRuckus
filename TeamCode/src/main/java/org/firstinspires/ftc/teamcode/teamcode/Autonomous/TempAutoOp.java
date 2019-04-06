@@ -5,8 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -19,10 +21,10 @@ import java.sql.Time;
 @Autonomous(name="Weekend Auto", group="Autonomous")
 public class TempAutoOp extends LinearOpMode {
 
-    private DcMotor frontLeft, frontRight, backLeft, backRight;
+    private DcMotor latchMotor, slideMotor, intakeMotor, liftMotor,
+            leftBack, rightBack, leftFront, rightFront;
 
-    private DcMotor latchMotor, slideMotor, intakeMotor;
-
+    private Servo blockServo, boxServo;
     private CRServo lflipServo, rflipServo;
 
     private BNO055IMU imu;
@@ -41,22 +43,26 @@ public class TempAutoOp extends LinearOpMode {
     @Override
     public void runOpMode(){
 
-
-        //map hardware---------------------------------------------
-        frontLeft = hardwareMap.dcMotor.get("fl");
-        frontRight = hardwareMap.dcMotor.get("fr");
-        backLeft = hardwareMap.dcMotor.get("bl");
-        backRight = hardwareMap.dcMotor.get("br");
-
-        frontRight.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.REVERSE);
-
         latchMotor = hardwareMap.dcMotor.get("latch");
         slideMotor = hardwareMap.dcMotor.get("slide");
         intakeMotor = hardwareMap.dcMotor.get("intake");
+        liftMotor = hardwareMap.dcMotor.get("lift");
 
-        lflipServo = hardwareMap.crservo.get("lflip");
-        rflipServo = hardwareMap.crservo.get("rflip");
+        leftBack = hardwareMap.dcMotor.get("lb");
+        rightBack = hardwareMap.dcMotor.get("rb");
+        leftFront = hardwareMap.dcMotor.get("lf");
+        rightFront = hardwareMap.dcMotor.get("rf");
+
+        liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        latchMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        slideMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        latchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        lflipServo = hardwareMap.crservo.get("flipl");
+        rflipServo = hardwareMap.crservo.get("flipr");
+        blockServo = hardwareMap.servo.get("block");
+        boxServo = hardwareMap.servo.get("box");
 
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -83,13 +89,27 @@ public class TempAutoOp extends LinearOpMode {
 
         baseAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
 
+        latchMotor.setPower(-0.001);
+
         //START-------------------------
 
         waitForStart();
 
+        latchMotor.setPower(1);
+        WaitFor(2.8);
+        latchMotor.setPower(0);
+
+        Drive(0, -1, 0, 0.3);
+        WaitFor(0.2);
+        StopDriveMotors();
+
+        WaitFor(0.50);
+
+        Sampling();
+
         //get out of latch
 
-        EncoderDrive(1, -2,-2,10);
+        /*EncoderDrive(1, -2,-2,10);
         TimeStrafe(1,.6);
         EncoderDrive(.5, 4,4, 10);
 
@@ -128,8 +148,21 @@ public class TempAutoOp extends LinearOpMode {
 
         //drive into crater
         EncoderDrive(1, -40,-40, 10);
+        */
 
 
+    }
+
+    void Drive(double x, double y, double rot, double speedMod){
+
+        double dx = x;
+        double dy = -y;
+        double r = rot;
+
+        leftFront.setPower(Range.clip(dy - dx - (r * 0.9), -1, 1) * speedMod);
+        rightFront.setPower(Range.clip(-dy - dx - (r * 0.9), -1, 1) * speedMod);
+        leftBack.setPower(Range.clip(dy + dx - (r * 0.9), -1, 1) * speedMod);
+        rightBack.setPower(Range.clip(-dy + dx - (r * 0.9), -1, 1) * speedMod);
 
     }
 
@@ -182,27 +215,27 @@ public class TempAutoOp extends LinearOpMode {
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            newLeftTarget = frontLeft.getCurrentPosition() + (int) ((leftInches * COUNTS_PER_INCH));
-            newRightTarget = frontRight.getCurrentPosition() + (int) ((rightInches * COUNTS_PER_INCH));
-            frontLeft.setTargetPosition(newLeftTarget);
-            backLeft.setTargetPosition(newLeftTarget);
-            frontRight.setTargetPosition(newRightTarget);
-            backRight.setTargetPosition(newRightTarget);
+            newLeftTarget = leftFront.getCurrentPosition() + (int) ((leftInches * COUNTS_PER_INCH));
+            newRightTarget = rightFront.getCurrentPosition() + (int) ((rightInches * COUNTS_PER_INCH));
+            leftFront.setTargetPosition(newLeftTarget);
+            leftBack.setTargetPosition(newLeftTarget);
+            rightFront.setTargetPosition(newRightTarget);
+            rightBack.setTargetPosition(newRightTarget);
 
             // Turn On RUN_TO_POSITION
-            frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
             // reset the timeout time and start motion.
             runtime.reset();
 
-            frontLeft.setPower(Math.abs(speed));
-            backLeft.setPower(Math.abs(speed));
-            frontRight.setPower(Math.abs(speed));
-            frontRight.setPower(Math.abs(speed));
+            leftFront.setPower(Math.abs(speed));
+            leftBack.setPower(Math.abs(speed));
+            rightFront.setPower(Math.abs(speed));
+            rightFront.setPower(Math.abs(speed));
 
             // keep looping while we are still active, and there is time left, and both motors are running.
             // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
@@ -212,13 +245,13 @@ public class TempAutoOp extends LinearOpMode {
             // onto the next step, use (isBusy() || isBusy()) in the loop test.
             while (opModeIsActive() &&
                     (runtime.seconds() < timeout) &&
-                    (frontLeft.isBusy() && frontRight.isBusy())) {
+                    (leftFront.isBusy() && rightFront.isBusy())) {
 
                 // Display it for the driver.
                 telemetry.addData("Path1", "Running to %7d :%7d", newLeftTarget, newRightTarget);
                 telemetry.addData("Path2", "Running at %7d :%7d",
-                        frontLeft.getCurrentPosition(),
-                        frontRight.getCurrentPosition());
+                        leftFront.getCurrentPosition(),
+                        rightFront.getCurrentPosition());
                 telemetry.update();
             }
 
@@ -226,16 +259,16 @@ public class TempAutoOp extends LinearOpMode {
             StopDriveMotors();
 
             // Turn off RUN_TO_POSITION
-            frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
-            frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             //  sleep(250);   // optional pause after each move
         }
@@ -244,10 +277,7 @@ public class TempAutoOp extends LinearOpMode {
 
     void TimeStrafe(double speed, double time){
 
-        frontLeft.setPower(speed);
-        backLeft.setPower(-speed);
-        frontRight.setPower(-speed);
-        backRight.setPower(speed);
+        Drive(speed, 0, 0, 1);
 
         WaitFor(time);
 
@@ -263,10 +293,7 @@ public class TempAutoOp extends LinearOpMode {
 
             while (opModeIsActive() && imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle < targetAngle) {
 
-                frontLeft.setPower(-speed);
-                backLeft.setPower(-speed);
-                frontRight.setPower(speed);
-                backRight.setPower(speed);
+                Drive(0, 0, ((currentAngle - targetAngle + 5) / 20), 0.5);
             }
 
 
@@ -274,10 +301,7 @@ public class TempAutoOp extends LinearOpMode {
 
             while (opModeIsActive() && imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle > targetAngle) {
 
-                frontLeft.setPower(speed);
-                backLeft.setPower(speed);
-                frontRight.setPower(-speed);
-                backRight.setPower(-speed);
+                Drive(0, 0, ((targetAngle - currentAngle - 5) / 20), 0.5);
             }
         }
 
@@ -289,25 +313,25 @@ public class TempAutoOp extends LinearOpMode {
     private void ResetDriveEncoders(){
 
 
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
 
     public void StopDriveMotors(){
 
-        frontLeft.setPower(0);
-        frontRight.setPower(0);
-        backLeft.setPower(0);
-        backRight.setPower(0);
+        leftFront.setPower(0);
+        leftBack.setPower(0);
+        rightFront.setPower(0);
+        rightFront.setPower(0);
 
     }
 
@@ -321,7 +345,7 @@ public class TempAutoOp extends LinearOpMode {
 
     public void Sampling(){
 
-        //dogevuforia.start();
+        dogevuforia.start();
         WaitFor(.5);
 
         GoldPosition goldPos = GoldPosition.RIGHT;
@@ -331,9 +355,9 @@ public class TempAutoOp extends LinearOpMode {
         //check the left and mid, otherwise choose right
         if (dogevuforia.isGold() && dogevuforia.getPosition().y > 125){
             if(dogevuforia.getGoldXPosition() > 100 && dogevuforia.getGoldXPosition() < 250){
-                goldPos = GoldPosition.LEFT;
-            }else if (dogevuforia.getGoldXPosition() > 425 && dogevuforia.getGoldXPosition() < 600){
                 goldPos = GoldPosition.MID;
+            }else if (dogevuforia.getGoldXPosition() > 425 && dogevuforia.getGoldXPosition() < 600){
+                goldPos = GoldPosition.LEFT;
             }
 
         }else{
@@ -341,6 +365,14 @@ public class TempAutoOp extends LinearOpMode {
             goldPos = GoldPosition.RIGHT;
         }
 
+        WaitFor(0.5);
+
+        Drive(1, 0, 0, 0.23);
+        WaitFor(0.4);
+
+        StopDriveMotors();
+
+        WaitFor(0.25);
 
       /* while (runTime.seconds() < getNewTime(5)) {
             telemetry.addData("Gold pos:", goldPos);
@@ -348,7 +380,74 @@ public class TempAutoOp extends LinearOpMode {
 
         }
 */
-        switch(goldPos){
+
+        if(goldPos == GoldPosition.LEFT){
+
+            Drive(0, -1, 0, 0.23);
+
+        }else{
+
+            Drive(0, 1, 0, 0.23);
+
+        }
+
+        switch (goldPos){
+
+            case LEFT:
+                WaitFor(0.4);
+                break;
+
+            case MID:
+                WaitFor(0.3);
+                break;
+
+            case RIGHT:
+                WaitFor(0.9);
+                break;
+
+        }
+
+        StopDriveMotors();
+
+        WaitFor(0.5);
+
+        Drive(1, 0, 0, 0.5);
+
+        WaitFor(1.2);
+        StopDriveMotors();
+
+        /*WaitFor(0.6);
+
+        StopDriveMotors();
+        WaitFor(0.25);
+
+        Drive(-1, 0, 0, 0.5);
+        WaitFor(0.7);
+
+        StopDriveMotors();
+        WaitFor(0.25);
+
+        Drive(0, 1, 0, 0.4);
+
+        switch (goldPos){
+
+            case LEFT:
+                WaitFor(1.2);
+                break;
+
+            case MID:
+                WaitFor(0.7);
+                break;
+
+            case RIGHT:
+                WaitFor(0.3);
+                break;
+
+        }
+
+        StopDriveMotors();*/
+
+        /*switch(goldPos){
 
             case LEFT:
 
@@ -369,7 +468,7 @@ public class TempAutoOp extends LinearOpMode {
                 TimeStrafe(1,-1.5);
                 EncoderDrive(1,-4,-4,10);
                 break;
-        }
+        }*/
 
     }
 

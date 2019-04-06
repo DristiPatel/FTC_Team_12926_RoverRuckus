@@ -17,16 +17,17 @@ public class TankOp extends OpMode {
     private DcMotor latchMotor, slideMotor, intakeMotor, liftMotor,
             leftBack, rightBack, leftFront, rightFront;
 
-    private Servo lflipServo, rflipServo, blockServo, boxServo;
+    private Servo blockServo, boxServo;
+    private CRServo lflipServo, rflipServo;
 
-    private int maxSlide = 10000,
+    private int maxSlide = 2000,
             minSlide = 0,
-            maxLift = 10000,
+            maxLift = 4400,
             minLift = 0;
 
     private int speedMod = 1;
 
-    boolean usingLimits = true;
+    boolean usingLimits = true, locked = false, changeLock = false;
 
     //DogeVuforia doge;
 
@@ -43,11 +44,12 @@ public class TankOp extends OpMode {
         leftFront = hardwareMap.dcMotor.get("lf");
         rightFront = hardwareMap.dcMotor.get("rf");
 
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        latchMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        slideMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        lflipServo = hardwareMap.servo.get("flipl");
-        rflipServo = hardwareMap.servo.get("flipr");
+        lflipServo = hardwareMap.crservo.get("flipl");
+        rflipServo = hardwareMap.crservo.get("flipr");
         blockServo = hardwareMap.servo.get("block");
         boxServo = hardwareMap.servo.get("box");
 
@@ -63,6 +65,7 @@ public class TankOp extends OpMode {
         telemetry.addData("latch", latchMotor.getCurrentPosition());
         telemetry.addData("slide", slideMotor.getCurrentPosition());
         telemetry.addData("intake", intakeMotor.getCurrentPosition());
+        telemetry.addData("lift", liftMotor.getCurrentPosition());
 
         telemetry.addLine("Gold Detector stuffs0-----------");
         //telemetry.addData("is Aligned: ", doge.getIsAligned());
@@ -91,10 +94,10 @@ public class TankOp extends OpMode {
 
     public void DriveControl(){
 
-        leftFront.setPower(Range.clip(-gamepad1.left_stick_y - gamepad1.left_stick_x - (gamepad1.right_stick_x * 0.9), -1, 1) * speedMod);
-        rightFront.setPower(Range.clip(gamepad1.left_stick_y - gamepad1.left_stick_x - (gamepad1.right_stick_x * 0.9), -1, 1) * speedMod);
-        leftBack.setPower(Range.clip(-gamepad1.left_stick_y + gamepad1.left_stick_x - (gamepad1.right_stick_x * 0.9), -1, 1) * speedMod);
-        rightBack.setPower(Range.clip(gamepad1.left_stick_y + gamepad1.left_stick_x - (gamepad1.right_stick_x * 0.9), -1, 1) * speedMod);
+        leftFront.setPower(Range.clip(gamepad1.left_stick_y - gamepad1.left_stick_x - (gamepad1.right_stick_x * 0.9), -1, 1) * speedMod);
+        rightFront.setPower(Range.clip(-gamepad1.left_stick_y - gamepad1.left_stick_x - (gamepad1.right_stick_x * 0.9), -1, 1) * speedMod);
+        leftBack.setPower(Range.clip(gamepad1.left_stick_y + gamepad1.left_stick_x - (gamepad1.right_stick_x * 0.9), -1, 1) * speedMod);
+        rightBack.setPower(Range.clip(-gamepad1.left_stick_y + gamepad1.left_stick_x - (gamepad1.right_stick_x * 0.9), -1, 1) * speedMod);
 
     }
 
@@ -122,10 +125,10 @@ public class TankOp extends OpMode {
 
     public void SlideControl(){
 
-        if((slideMotor.getCurrentPosition() > minSlide || !usingLimits) && gamepad2.left_stick_y < 0)
-            slideMotor.setPower(gamepad2.left_stick_y);
-        else if((slideMotor.getCurrentPosition() < maxSlide || !usingLimits) && gamepad2.left_stick_y > 0)
-            slideMotor.setPower(gamepad2.left_stick_y);
+        if((slideMotor.getCurrentPosition() > minSlide || !usingLimits) && gamepad2.right_stick_x < 0)
+            slideMotor.setPower(gamepad2.right_stick_x * 0.5);
+        else if((slideMotor.getCurrentPosition() < maxSlide || !usingLimits) && gamepad2.right_stick_x > 0)
+            slideMotor.setPower(gamepad2.right_stick_x * 0.5);
         else
             slideMotor.setPower(0);
 
@@ -133,30 +136,50 @@ public class TankOp extends OpMode {
 
     public void FlipControl(){
 
-        if(gamepad2.x){
+        if(gamepad2.left_stick_y > 0){
 
-            lflipServo.setPosition(1);
-            rflipServo.setPosition(-1);
+            lflipServo.setPower(1);
+            rflipServo.setPower(-1);
 
-        }else if(gamepad2.y){
+        }else if(gamepad2.left_stick_y < 0){
 
-            lflipServo.setPosition(-1);
-            rflipServo.setPosition(1);
+            lflipServo.setPower(-1);
+            rflipServo.setPower(1);
+
+        }else{
+
+            lflipServo.setPower(0);
+            rflipServo.setPower(0);
+
         }
 
     }
 
     public void BlockControl(){
 
-        if(gamepad2.a){
+        if(gamepad2.a && !changeLock){
+
+            changeLock = true;
+
+        }
+
+        if(changeLock && !gamepad2.a){
+
+            changeLock = false;
+            locked = !locked;
+
+        }
+
+        if(locked) {
 
             blockServo.setPosition(-1);
             boxServo.setPosition(-1);
 
-        }else if(gamepad2.b){
+        }else {
 
             blockServo.setPosition(1);
             boxServo.setPosition(1);
+
         }
 
     }
